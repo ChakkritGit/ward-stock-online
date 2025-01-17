@@ -27,13 +27,13 @@ class MenuList extends StatelessWidget {
                   child: Container(
                     color: Colors.transparent,
                     padding: const EdgeInsets.all(20),
-                    height: 130.0,
+                    height: 150.0,
                     width: 150.0,
                     child: const Column(
                       children: [
                         Icon(
                           Icons.add_box_rounded,
-                          size: 48.0,
+                          size: 64.0,
                           color: Colors.white,
                         ),
                         CustomGap.smallHeightGap,
@@ -41,7 +41,7 @@ class MenuList extends StatelessWidget {
                           'เติมยา',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20.0,
+                            fontSize: 24.0,
                           ),
                         ),
                       ],
@@ -58,13 +58,13 @@ class MenuList extends StatelessWidget {
                   child: Container(
                     color: Colors.transparent,
                     padding: const EdgeInsets.all(20),
-                    height: 130.0,
+                    height: 150.0,
                     width: 150.0,
                     child: const Column(
                       children: [
                         Icon(
                           Icons.edit_document,
-                          size: 48.0,
+                          size: 64.0,
                           color: Colors.white,
                         ),
                         CustomGap.smallHeightGap,
@@ -72,7 +72,7 @@ class MenuList extends StatelessWidget {
                           'รายงาน',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20.0,
+                            fontSize: 24.0,
                           ),
                         ),
                       ],
@@ -90,13 +90,13 @@ class MenuList extends StatelessWidget {
                   child: Container(
                     color: Colors.transparent,
                     padding: const EdgeInsets.all(20),
-                    height: 130.0,
+                    height: 150.0,
                     width: 150.0,
                     child: const Column(
                       children: [
                         Icon(
                           Icons.manage_accounts,
-                          size: 48.0,
+                          size: 64.0,
                           color: Colors.white,
                         ),
                         CustomGap.smallHeightGap,
@@ -104,7 +104,7 @@ class MenuList extends StatelessWidget {
                           'จัดการ',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20.0,
+                            fontSize: 24.0,
                           ),
                         ),
                       ],
@@ -122,13 +122,13 @@ class MenuList extends StatelessWidget {
                   child: Container(
                     color: Colors.transparent,
                     padding: const EdgeInsets.all(20),
-                    height: 130.0,
+                    height: 150.0,
                     width: 150.0,
                     child: const Column(
                       children: [
                         Icon(
                           Icons.settings,
-                          size: 48.0,
+                          size: 64.0,
                           color: Colors.white,
                         ),
                         CustomGap.smallHeightGap,
@@ -136,7 +136,7 @@ class MenuList extends StatelessWidget {
                           'ตั้งค่า',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20.0,
+                            fontSize: 24.0,
                           ),
                         ),
                       ],

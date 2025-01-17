@@ -1,6 +1,5 @@
 // ignore_for_file: use_build_context_synchronously, deprecated_member_use
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,7 +11,6 @@ import 'package:vending_standalone/src/constants/colors.dart';
 import 'package:vending_standalone/src/constants/initail_store.dart';
 import 'package:vending_standalone/src/constants/style.dart';
 import 'package:vending_standalone/src/models/order/order_model.dart';
-import 'package:vending_standalone/src/models/rabbit/rabbit_model.dart';
 import 'package:vending_standalone/src/models/users/user_local_model.dart';
 import 'package:vending_standalone/src/services/RabbitMQ.dart';
 import 'package:vending_standalone/src/services/serialport.dart';
@@ -159,7 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    vending.connectPort();
+    // vending.connectPort();
     initialData();
   }
 
@@ -228,76 +226,95 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         floatingActionButton: Row(
           mainAxisAlignment: MainAxisAlignment.end,
-          spacing: 10.0,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          spacing: 30.0,
           children: [
-            FloatingActionButton.large(
-              backgroundColor: ColorsTheme.primary,
-              onPressed: () async {
-                try {
-                  await rabbitMQ.deleteAndRecreateQueue('vdOrder');
-                  var response = await dioHelper.dio
-                      .get('/dispense/prescription/order/clear');
-                  await dioHelper.getOrder(context);
-                  ScaffoldMessage.show(
-                    context,
-                    Icons.check_circle_outline_rounded,
-                    response.data['data'],
-                    's',
-                  );
-                } catch (error) {
-                  if (kDebugMode) {
-                    print(error);
-                  }
-                  ScaffoldMessage.show(
-                    context,
-                    Icons.error_outline_rounded,
-                    'เกิดข้อผิดพลาด!',
-                    'e',
-                  );
-                }
-              },
-              child: const Icon(
-                Icons.restart_alt_rounded,
-                size: 54.0,
-                color: Colors.white,
-              ),
+            Column(
+              spacing: 10.0,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                FloatingActionButton.large(
+                  heroTag: 'uniqueTag1',
+                  backgroundColor: ColorsTheme.primary,
+                  onPressed: () async {
+                    try {
+                      await rabbitMQ.deleteAndRecreateQueue('vdOrder');
+                      var response = await dioHelper.dio
+                          .get('/dispense/prescription/order/clear');
+                      await dioHelper.getOrder(context);
+                      ScaffoldMessage.show(
+                        context,
+                        Icons.check_circle_outline_rounded,
+                        response.data['data'],
+                        's',
+                      );
+                    } catch (error) {
+                      if (kDebugMode) {
+                        print(error);
+                      }
+                      ScaffoldMessage.show(
+                        context,
+                        Icons.error_outline_rounded,
+                        'เกิดข้อผิดพลาด!',
+                        'e',
+                      );
+                    }
+                  },
+                  child: const Icon(
+                    Icons.restore_page_outlined,
+                    size: 54.0,
+                    color: Colors.white,
+                  ),
+                ),
+                const Text(
+                  'รีเซ็ตรายการ',
+                  style: TextStyle(fontSize: 20.0),
+                )
+              ],
             ),
-            FloatingActionButton.large(
-              backgroundColor: ColorsTheme.error,
-              onPressed: () async {
-                try {
-                  final resetSuccess = await rabbitMQ.rejectMessageManually();
-
-                  Map<String, dynamic> jsonData = jsonDecode(resetSuccess);
-                  OrderRabbit order = OrderRabbit.fromMap(jsonData);
-
-                  await dioHelper.dio
-                      .get('/dispense/order/status/ready/${order.id}/${order.presId}');
-                  await dioHelper.getOrder(context);
-                  ScaffoldMessage.show(
-                    context,
-                    Icons.check_circle_outline_rounded,
-                    'รีเซ็ตสำเร็จ',
-                    's',
-                  );
-                } catch (error) {
-                  if (kDebugMode) {
-                    print(error);
-                  }
-                  ScaffoldMessage.show(
-                    context,
-                    Icons.error_outline_rounded,
-                    'เกิดข้อผิดพลาด!',
-                    'e',
-                  );
-                }
-              },
-              child: const Icon(
-                Icons.restart_alt_rounded,
-                size: 54.0,
-                color: Colors.white,
-              ),
-            ),
+            Column(
+              spacing: 10.0,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                FloatingActionButton.large(
+                  heroTag: 'uniqueTag2',
+                  backgroundColor: ColorsTheme.error,
+                  onPressed: () async {
+                    try {
+                      final resetSuccess =
+                          await rabbitMQ.rejectMessageManually();
+                      ScaffoldMessage.show(
+                        context,
+                        Icons.check_circle_outline_rounded,
+                        resetSuccess,
+                        's',
+                      );
+                    } catch (error) {
+                      if (kDebugMode) {
+                        print(error);
+                      }
+                      ScaffoldMessage.show(
+                        context,
+                        Icons.error_outline_rounded,
+                        'เกิดข้อผิดพลาด!',
+                        'e',
+                      );
+                    }
+                  },
+                  child: const Icon(
+                    Icons.running_with_errors_outlined,
+                    size: 54.0,
+                    color: Colors.white,
+                  ),
+                ),
+                const Text(
+                  'รีเซ็ตเครื่อง',
+                  style: TextStyle(fontSize: 20.0),
+                )
+              ],
+            )
           ],
         ));
   }

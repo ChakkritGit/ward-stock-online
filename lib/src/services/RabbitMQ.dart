@@ -151,17 +151,22 @@ class RabbitMQService {
     try {
       if (newMessage != null) {
         await dispense.manuallyResetMachine();
+        Map<String, dynamic> jsonData = jsonDecode(ackMessage);
+        OrderRabbit order = OrderRabbit.fromMap(jsonData);
+        await dioHelper.dio
+            .get('/dispense/order/status/ready/${order.id}/${order.presId}');
+        await dioHelper.getOrder(context);
         newMessage!.reject(true);
         if (kDebugMode) {
           print("manually reject message: $ackMessage");
         }
       }
-      return ackMessage;
+      return 'รีเซ็ตสำเร็จ';
     } catch (e) {
       if (kDebugMode) {
         print("Error manually reject message: $e");
       }
-      return ackMessage;
+      return 'รีเซ็ตไม่สำเร็จ';
     }
   }
 
