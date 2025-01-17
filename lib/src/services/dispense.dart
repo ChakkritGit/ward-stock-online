@@ -7,7 +7,6 @@ class Dispense {
   final VendingMachine vending;
   late SharedPreferences prefs;
   List<int> writedata = [];
-  String progress = 'ready';
   int running = 1;
 
   Dispense({required this.vending}) {
@@ -21,6 +20,7 @@ class Dispense {
 
   Future<bool> sendToMachine(int dispenseQty, int position) async {
     Completer<bool> completer = Completer<bool>();
+    String progress = 'ready';
     bool isDispense = false;
     int floor = -1;
     int qty = dispenseQty;
@@ -47,7 +47,9 @@ class Dispense {
             writedata = [];
             if (progress == 'dispensing') {
               if (qty <= 0) {
-                backToHome();
+                progress = 'liftDown';
+                await Future.delayed(const Duration(seconds: 1));
+                vending.writeSerialttyS2("# 1 1 1 -1 2");
               } else {
                 writeSerialttyS1(position);
               }
@@ -160,11 +162,13 @@ class Dispense {
 
   Future<bool> manuallyResetMachine() async {
     Completer<bool> completer = Completer<bool>();
+      String progress = 'ready';
     bool isDispense = false;
 
     try {
       isDispense = true;
-      backToHome();
+      progress = 'liftDown';
+      vending.writeSerialttyS2("# 1 1 1 -1 2");
 
       vending.upcomingDatattyS2().listen(
         (data) async {
@@ -234,9 +238,9 @@ class Dispense {
     writedata = commands;
   }
 
-  void backToHome() async {
-    progress = 'liftDown';
-    await Future.delayed(const Duration(seconds: 1));
-    vending.writeSerialttyS2("# 1 1 1 -1 2");
-  }
+  // void backToHome() async {
+  //   progress = 'liftDown';
+  //   await Future.delayed(const Duration(seconds: 1));
+  //   vending.writeSerialttyS2("# 1 1 1 -1 2");
+  // }
 }
