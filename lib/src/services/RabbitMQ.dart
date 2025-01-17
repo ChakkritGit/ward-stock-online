@@ -87,11 +87,13 @@ class RabbitMQService {
       await dioHelper.dio
           .get('/dispense/order/status/pending/${order.id}/${order.presId}');
 
-      await Future.delayed(const Duration(milliseconds: 700));
-
       await dioHelper.getOrder(context);
 
       final dispensed = await dispense.sendToMachine(order.qty, order.position);
+
+      if (kDebugMode) {
+        print(dispensed);
+      }
 
       if (dispensed) {
         await dioHelper.dio

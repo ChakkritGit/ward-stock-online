@@ -117,7 +117,7 @@ class Dispense {
                   // สั่งหยิบ
                   progress = 'dispensing';
                   writeSerialttyS1(position);
-                } else if (progress == 'liftDown') {
+                } else {
                   // สั่งปิดประตู
                   vending.writeSerialttyS2('# 1 1 6 10 18');
                   progress = 'doorClosed';
@@ -132,13 +132,11 @@ class Dispense {
               case '26,31,d,a,32,d,a,33,d,a,30,d,a,36,d,a':
                 // ปลอดล็อกกลอนแล้ว
                 // กลับคืนค่าเริ่มต้น
-                if (progress == "rackUnlocked") {
-                  isDispense = false;
-                  qty = 0;
-                  floor = 20;
-                  progress = 'ready';
-                  completer.complete(true);
-                }
+                completer.complete(true);
+                qty = 0;
+                floor = 20;
+                progress = 'ready';
+                isDispense = false;
                 break;
               default:
             }
@@ -155,14 +153,13 @@ class Dispense {
         print("SerialPortError: $error");
       }
       completer.complete(false);
-      rethrow;
     }
     return completer.future;
   }
 
   Future<bool> manuallyResetMachine() async {
     Completer<bool> completer = Completer<bool>();
-      String progress = 'ready';
+    String progress = 'ready';
     bool isDispense = false;
 
     try {
@@ -186,11 +183,9 @@ class Dispense {
                 break;
               case '26,31,d,a,32,d,a,36,d,a,31,d,a,31,30,d,a':
                 // ประตูปิดแล้ว
-                if (progress == 'doorClosed') {
-                  progress = 'ready';
-                  isDispense = false;
-                  completer.complete(true);
-                }
+                completer.complete(true);
+                progress = 'ready';
+                isDispense = false;
                 break;
               default:
             }
