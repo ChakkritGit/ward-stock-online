@@ -96,13 +96,11 @@ class RabbitMQService {
       if (dispensed) {
         await dioHelper.dio
             .get('/dispense/order/status/receive/${order.id}/${order.presId}');
-        await Future.delayed(const Duration(milliseconds: 500));
         await dioHelper.getOrder(context);
         await vending.disconnectPort();
       } else {
         await dioHelper.dio
             .get('/dispense/order/status/error/${order.id}/${order.presId}');
-        await Future.delayed(const Duration(milliseconds: 500));
         await dioHelper.getOrder(context);
         await vending.disconnectPort();
       }

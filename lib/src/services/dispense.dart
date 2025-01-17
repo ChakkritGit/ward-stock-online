@@ -152,7 +152,7 @@ class Dispense {
       if (kDebugMode) {
         print("SerialPortError: $error");
       }
-      completer.completeError(error);
+      completer.complete(false);
       rethrow;
     }
     return completer.future;

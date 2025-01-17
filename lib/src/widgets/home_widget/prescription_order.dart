@@ -99,7 +99,7 @@ class PrescriptionOrderCardWidget extends StatelessWidget {
                                           Container(
                                             padding: const EdgeInsets.all(10.0),
                                             decoration: BoxDecoration(
-                                              color: ColorsTheme.primary,
+                                              color: Colors.transparent,
                                               border: Border.all(
                                                   color: ColorsTheme.primary,
                                                   width: 2.0),
@@ -109,13 +109,14 @@ class PrescriptionOrderCardWidget extends StatelessWidget {
                                             child: Text(
                                               'Quantity: ${order.qty} ${order.unit}',
                                               style: const TextStyle(
-                                                  fontSize: 18.0),
+                                                  fontSize: 18.0,
+                                                  color: ColorsTheme.primary),
                                             ),
                                           ),
                                           Container(
                                             padding: const EdgeInsets.all(10.0),
                                             decoration: BoxDecoration(
-                                              color: ColorsTheme.primary,
+                                              color: Colors.transparent,
                                               border: Border.all(
                                                   color: ColorsTheme.primary,
                                                   width: 2.0),
@@ -125,7 +126,8 @@ class PrescriptionOrderCardWidget extends StatelessWidget {
                                             child: Text(
                                               'Position: ${order.position}',
                                               style: const TextStyle(
-                                                  fontSize: 18.0),
+                                                  fontSize: 18.0,
+                                                  color: ColorsTheme.primary),
                                             ),
                                           ),
                                         ],
