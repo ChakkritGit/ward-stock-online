@@ -81,7 +81,6 @@ class PrescriptionOrderCardWidget extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  // ข้อมูลของยา
                                   Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -94,15 +93,43 @@ class PrescriptionOrderCardWidget extends StatelessWidget {
                                         ),
                                       ),
                                       CustomGap.smallHeightGap,
-                                      Text(
-                                        'Quantity: ${order.qty} ${order.unit}',
-                                        style: const TextStyle(fontSize: 18.0),
-                                      ),
-                                      const SizedBox(height: 5),
-                                      Text(
-                                        'Position: ${order.position}',
-                                        style: const TextStyle(fontSize: 18.0),
-                                      ),
+                                      Row(
+                                        spacing: 10.0,
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(10.0),
+                                            decoration: BoxDecoration(
+                                              color: ColorsTheme.primary,
+                                              border: Border.all(
+                                                  color: ColorsTheme.primary,
+                                                  width: 2.0),
+                                              borderRadius:
+                                                  BorderRadius.circular(10.0),
+                                            ),
+                                            child: Text(
+                                              'Quantity: ${order.qty} ${order.unit}',
+                                              style: const TextStyle(
+                                                  fontSize: 18.0),
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.all(10.0),
+                                            decoration: BoxDecoration(
+                                              color: ColorsTheme.primary,
+                                              border: Border.all(
+                                                  color: ColorsTheme.primary,
+                                                  width: 2.0),
+                                              borderRadius:
+                                                  BorderRadius.circular(10.0),
+                                            ),
+                                            child: Text(
+                                              'Position: ${order.position}',
+                                              style: const TextStyle(
+                                                  fontSize: 18.0),
+                                            ),
+                                          ),
+                                        ],
+                                      )
                                     ],
                                   ),
 
