@@ -9,7 +9,6 @@ import 'package:vending_standalone/src/blocs/order/order_bloc.dart';
 import 'package:vending_standalone/src/blocs/users/user_bloc.dart';
 import 'package:vending_standalone/src/constants/initail_store.dart';
 import 'package:vending_standalone/src/constants/style.dart';
-import 'package:vending_standalone/src/database/db_helper.dart';
 import 'package:vending_standalone/src/models/users/user_local_model.dart';
 
 void main() async {
@@ -18,7 +17,6 @@ void main() async {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   UserLocal? userData = await StoredLocal.instance.getUserData();
-  await DatabaseHelper.instance.database;
   final userBloc = BlocProvider<UserBloc>(create: (context) => UserBloc());
   final drugBloc = BlocProvider<DrugBloc>(create: (context) => DrugBloc());
   final machineBloc =

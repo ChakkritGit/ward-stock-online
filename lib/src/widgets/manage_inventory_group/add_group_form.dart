@@ -1,10 +1,15 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'package:vending_standalone/src/api/dio_helper.dart';
+import 'package:vending_standalone/src/blocs/inventory/inventory_bloc.dart';
 import 'package:vending_standalone/src/constants/colors.dart';
+import 'package:vending_standalone/src/constants/instants_dropdown.dart';
 import 'package:vending_standalone/src/constants/style.dart';
-import 'package:vending_standalone/src/database/db_helper.dart';
 import 'package:vending_standalone/src/models/drugs/drug_list_model.dart';
 import 'package:vending_standalone/src/models/drugs/drug_model.dart';
 import 'package:vending_standalone/src/models/inventory/inventory.dart';
@@ -27,6 +32,7 @@ class _AddGroupFormState extends State<AddGroupForm> {
   List<String> selectedInventoryIds = [];
   late TextEditingController groupMin;
   late TextEditingController groupMax;
+  bool isLoading = false;
 
   List<Map<String, dynamic>> createInventoryList() {
     List<Map<String, dynamic>> inventories = [];
@@ -41,50 +47,114 @@ class _AddGroupFormState extends State<AddGroupForm> {
   }
 
   Future handleSubmit(BuildContext context) async {
-    if (!isSameFloor(selectedInventoryIds)) {
-      ScaffoldMessage.show(context, Icons.warning_amber_rounded,
-          'กรุณาจัดช่องในชั้นเดียวกัน', 'w');
-      return;
-    }
-
     if (selectedDrugId != null &&
         selectedInventoryIds.isNotEmpty &&
         groupMin.text.isNotEmpty &&
         groupMax.text.isNotEmpty) {
-      var result = await DatabaseHelper.instance.createGroupAndInventory(
-        context,
-        drugId: selectedDrugId,
-        inventories: createInventoryList(),
-        groupMin: groupMin.text,
-        groupMax: groupMax.text,
-      );
-      if (result) Navigator.of(context).pop();
+      if (!isSameFloor(selectedInventoryIds)) {
+        ScaffoldMessage.show(context, Icons.warning_amber_rounded,
+            'กรุณาจัดช่องในชั้นเดียวกัน', 'w');
+        return;
+      }
+
+      try {
+        final body = {
+          'drugId': selectedDrugId,
+          'inventories': createInventoryList(),
+          'groupMin': int.tryParse(groupMin.text),
+          'groupMax': int.tryParse(groupMax.text)
+        };
+        final response =
+            await DioHelper().dio.post('/group-inventory', data: body);
+
+        ScaffoldMessage.show(context, Icons.check_circle_outline_rounded,
+            'Group are saved', 's');
+        await DioHelper.instance.fetchGroupInventory(context);
+        if (response.statusCode == 201) Navigator.of(context).pop();
+      } catch (error) {
+        if (error is DioException) {
+          if (error.response != null) {
+            ScaffoldMessage.show(
+                context,
+                Icons.error_outline_rounded,
+                '${error.response?.statusCode} - ${error.response?.data['message']}',
+                'e');
+            if (kDebugMode) {
+              print('Error Message: ${error.response?.data}');
+            }
+          } else {
+            if (kDebugMode) {
+              print('DioError: ${error.message}');
+            }
+          }
+        } else {
+          if (kDebugMode) {
+            print('General error: $error');
+          }
+        }
+      } finally {
+        setState(() {
+          isLoading = false;
+        });
+      }
     } else {
       ScaffoldMessage.show(
           context, Icons.warning_amber_rounded, 'กรุณากรอกข้อมูลให้ครบ', 'w');
     }
   }
 
-  Future handleSubmitEdit(BuildContext context) async {
-    if (!isSameFloor(selectedInventoryIds)) {
-      ScaffoldMessage.show(context, Icons.warning_amber_rounded,
-          'กรุณาจัดช่องในชั้นเดียวกัน', 'w');
-      return;
-    }
-
+  Future handleSubmitEdit(BuildContext context, String id) async {
     if (selectedDrugId != null &&
         selectedInventoryIds.isNotEmpty &&
         groupMin.text.isNotEmpty &&
         groupMax.text.isNotEmpty) {
-      var result = await DatabaseHelper.instance.updateGroupAndInventory(
-        context,
-        widget.group?.groupid,
-        drugId: selectedDrugId,
-        inventories: createInventoryList(),
-        groupMin: groupMin.text,
-        groupMax: groupMax.text,
-      );
-      if (result) Navigator.of(context).pop();
+      if (!isSameFloor(selectedInventoryIds)) {
+        ScaffoldMessage.show(context, Icons.warning_amber_rounded,
+            'กรุณาจัดช่องในชั้นเดียวกัน', 'w');
+        return;
+      }
+
+      try {
+        final body = {
+          'drugId': selectedDrugId,
+          'inventories': createInventoryList(),
+          'groupMin': int.tryParse(groupMin.text),
+          'groupMax': int.tryParse(groupMax.text)
+        };
+        final response =
+            await DioHelper().dio.patch('/group-inventory/$id', data: body);
+
+        ScaffoldMessage.show(context, Icons.check_circle_outline_rounded,
+            'Group are edited', 's');
+        await DioHelper.instance.fetchGroupInventory(context);
+        await InventoryPosition.getInventory(context);
+        if (response.statusCode == 200) Navigator.of(context).pop();
+      } catch (error) {
+        if (error is DioException) {
+          if (error.response != null) {
+            ScaffoldMessage.show(
+                context,
+                Icons.error_outline_rounded,
+                '${error.response?.statusCode} - ${error.response?.data['message']}',
+                'e');
+            if (kDebugMode) {
+              print('Error Message: ${error.response?.data}');
+            }
+          } else {
+            if (kDebugMode) {
+              print('DioError: ${error.message}');
+            }
+          }
+        } else {
+          if (kDebugMode) {
+            print('General error: $error');
+          }
+        }
+      } finally {
+        setState(() {
+          isLoading = false;
+        });
+      }
     } else {
       ScaffoldMessage.show(
           context, Icons.warning_amber_rounded, 'กรุณากรอกข้อมูลให้ครบ', 'w');
@@ -92,10 +162,14 @@ class _AddGroupFormState extends State<AddGroupForm> {
   }
 
   bool isSameFloor(List<String> inventoryIds) {
-    List<int> positions = inventoryIds
-        .map((id) => widget.inventory.firstWhere(
-            (inventory) => inventory.id == id).position)
-        .toList();
+    final newInventory = context.read<InventoryBloc>().state.inventoryList;
+    List<int> positions = inventoryIds.map((id) {
+      final item = newInventory.firstWhere(
+        (inventory) => inventory.id == id,
+        orElse: () => throw StateError('ไม่พบ inventory ที่มี id: $id'),
+      );
+      return item.position;
+    }).toList();
 
     int floor = (positions.first - 1) ~/ 10;
 
@@ -250,6 +324,7 @@ class _AddGroupFormState extends State<AddGroupForm> {
             decoration: CustomInputStyle.inputBoxdecoration,
             child: TextFormField(
               controller: groupMin,
+              keyboardType: TextInputType.number,
               style: CustomInputStyle.inputStyle,
               decoration: const InputDecoration(
                 border: InputBorder.none,
@@ -270,6 +345,7 @@ class _AddGroupFormState extends State<AddGroupForm> {
             decoration: CustomInputStyle.inputBoxdecoration,
             child: TextFormField(
               controller: groupMax,
+              keyboardType: TextInputType.number,
               style: CustomInputStyle.inputStyle,
               decoration: const InputDecoration(
                 border: InputBorder.none,
@@ -284,7 +360,7 @@ class _AddGroupFormState extends State<AddGroupForm> {
             decoration: CustomInputStyle.buttonBoxdecoration,
             child: TextButton(
               onPressed: () => widget.group != null
-                  ? handleSubmitEdit(context)
+                  ? handleSubmitEdit(context, widget.group!.groupid)
                   : handleSubmit(context),
               child: const Text(
                 "บันทึก",

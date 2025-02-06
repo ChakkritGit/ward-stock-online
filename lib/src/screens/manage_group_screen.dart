@@ -1,12 +1,15 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vending_standalone/src/api/dio_helper.dart';
 import 'package:vending_standalone/src/blocs/drug/drug_bloc.dart';
 import 'package:vending_standalone/src/configs/routes.dart' as custom_route;
 import 'package:vending_standalone/src/constants/colors.dart';
+import 'package:vending_standalone/src/constants/initail_store.dart';
 import 'package:vending_standalone/src/constants/style.dart';
-import 'package:vending_standalone/src/database/db_helper.dart';
 import 'package:vending_standalone/src/models/drugs/drug_list_model.dart';
 import 'package:vending_standalone/src/screens/add_group.dart';
 import 'package:vending_standalone/src/widgets/manage_user_widget/image_file.dart';
@@ -91,18 +94,45 @@ class _ManageGroupScreenState extends State<ManageGroupScreen> {
                 ),
               ),
               onPressed: () async {
-                var resulst =
-                    await DatabaseHelper.instance.deleteGroup(context, id);
-
-                if (resulst) {
-                  ScaffoldMessage.show(
-                      context,
-                      Icons.check_circle_outline_rounded,
-                      'กรุ๊ป $drugName ถูกลบแล้ว',
-                      's');
-                  Navigator.of(context).pop(true);
-                } else {
-                  Navigator.of(context).pop(false);
+                try {
+                  final response =
+                      await DioHelper.instance.dio.delete('/group-inventory/$id');
+                  if (response.data['data'].isNotEmpty) {
+                    await DioHelper.instance.fetchGroupInventory(context);
+                    ScaffoldMessage.show(
+                        context,
+                        Icons.check_circle_outline_rounded,
+                        'กรุ๊ป $drugName ถูกลบแล้ว',
+                        's');
+                    Navigator.of(context).pop(true);
+                  } else {
+                    Navigator.of(context).pop(false);
+                  }
+                } catch (error) {
+                  if (error is DioException) {
+                    if (error.response != null) {
+                      if (error.response?.statusCode == 401) {
+                        await StoredLocal.instance.handleUnauthorized(context);
+                        return;
+                      }
+                      ScaffoldMessage.show(
+                          context,
+                          Icons.check_circle_outline_rounded,
+                          'กรุ๊ป $drugName ถูกลบแล้ว',
+                          's');
+                      if (kDebugMode) {
+                        print('Error Message: ${error.response?.data}');
+                      }
+                    } else {
+                      if (kDebugMode) {
+                        print('DioError: ${error.message}');
+                      }
+                    }
+                  } else {
+                    if (kDebugMode) {
+                      print('General error: $error');
+                    }
+                  }
                 }
               },
             ),

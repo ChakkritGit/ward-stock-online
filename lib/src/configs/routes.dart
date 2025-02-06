@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:vending_standalone/src/screens/add_group.dart';
 import 'package:vending_standalone/src/screens/add_inventory.dart';
 import 'package:vending_standalone/src/screens/add_machine.dart';
-import 'package:vending_standalone/src/screens/database_screen.dart';
 import 'package:vending_standalone/src/screens/manage_main_inventory_screen.dart';
 import 'package:vending_standalone/src/screens/manage_machine_screen.dart';
 import 'package:vending_standalone/src/screens/manage_profile_screen.dart';
@@ -46,7 +45,6 @@ class Routes {
     addinventory: (context) => const AddInventory(),
     addgroup: (context) => const AddGroup(),
     settings: (context) => const ManageSettingsScreen(),
-    database: (context) => const DatabaseScreen(),
     profile: (context) => const ManageProfileScreen(),
   };
 }

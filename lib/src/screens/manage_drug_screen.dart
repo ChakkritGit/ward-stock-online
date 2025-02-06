@@ -101,6 +101,7 @@ class _ManageDrugScreenState extends State<ManageDrugScreen> {
                   final response =
                       await DioHelper.instance.dio.delete('/drugs/$id');
                   if (response.data['data'].isNotEmpty) {
+                    await DioHelper.instance.fetchDrugs(context);
                     ScaffoldMessage.show(
                         context,
                         Icons.check_circle_outline_rounded,

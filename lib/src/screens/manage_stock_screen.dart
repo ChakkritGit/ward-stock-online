@@ -40,10 +40,10 @@ class _ManageStockScreenState extends State<ManageStockScreen> {
 
     setState(() {
       filteredStock = stockList.where((inv) {
-        final inventoryPosition = inv.position.toString();
-        final drugName = inv.drug?.drugName.toString().toLowerCase();
+        final inventoryPosition = inv.inventoryPosition.toString();
+        final drugName = inv.drugName.toLowerCase();
         return inventoryPosition.contains(query) ||
-            drugName!.contains(query.toLowerCase());
+            drugName.contains(query.toLowerCase());
       }).toList();
     });
   }
@@ -79,9 +79,9 @@ class _ManageStockScreenState extends State<ManageStockScreen> {
                       itemBuilder: (context, index) {
                         final stock = stockList[index];
 
-                        // เช็คจำนวนคงเหลือต่ำกว่า minQty หรือ เท่ากับ 0
-                        bool isLowQty = stock.qty <= stock.minQty;
-                        bool isOutOfStock = stock.qty == 0;
+                        bool isLowQty =
+                            stock.inventoryQty <= stock.inventoryMin;
+                        bool isOutOfStock = stock.inventoryQty == 0;
 
                         return Material(
                           color: Colors.transparent,
@@ -94,7 +94,7 @@ class _ManageStockScreenState extends State<ManageStockScreen> {
                                     MaterialPageRoute(
                                       builder: (context) => AddStock(
                                         titleText:
-                                            '${stock.drug?.drugName} ช่องที่ ${stock.position}',
+                                            '${stock.drugName} ช่องที่ ${stock.inventoryPosition}',
                                         stock: stock,
                                       ),
                                     ),
@@ -107,9 +107,7 @@ class _ManageStockScreenState extends State<ManageStockScreen> {
                                   children: [
                                     // ช่องว่างระหว่างชื่อยาและจำนวนคงเหลือ
                                     Text(
-                                      stock.drug?.drugName != null
-                                          ? stock.drug!.drugName
-                                          : '- -',
+                                      stock.drugName,
                                       style: const TextStyle(
                                         fontSize: 20.0,
                                         fontWeight: FontWeight.bold,
@@ -136,7 +134,7 @@ class _ManageStockScreenState extends State<ManageStockScreen> {
                                         ),
                                       ),
                                       child: Text(
-                                        'จำนวนคงเหลือ ${stock.qty.toString()}',
+                                        'จำนวนคงเหลือ ${stock.inventoryQty.toString()}',
                                         style: TextStyle(
                                           fontSize: 18.0,
                                           fontWeight: FontWeight.bold,
@@ -162,14 +160,14 @@ class _ManageStockScreenState extends State<ManageStockScreen> {
                                           MainAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Min ${stock.minQty.toString()}',
+                                          'Min ${stock.inventoryMin.toString()}',
                                           style: const TextStyle(
                                             fontSize: 18.0,
                                           ),
                                         ),
                                         CustomGap.smallWidthGap,
                                         Text(
-                                          'Max ${stock.maxQty.toString()}',
+                                          'Max ${stock.inventoryMAX.toString()}',
                                           style: const TextStyle(
                                             fontSize: 18.0,
                                           ),
@@ -187,8 +185,8 @@ class _ManageStockScreenState extends State<ManageStockScreen> {
                                           ClipRRect(
                                             borderRadius:
                                                 BorderRadius.circular(16.0),
-                                            child: ImageFile(
-                                                file: stock.drug?.picture),
+                                            child: ImageNetwork(
+                                                file: stock.drugImage),
                                           ),
                                           Positioned(
                                             bottom: 0,
@@ -196,7 +194,9 @@ class _ManageStockScreenState extends State<ManageStockScreen> {
                                             right: 0,
                                             child: Container(
                                               decoration: BoxDecoration(
-                                                color: Colors.black.withValues(alpha: 0.5), // Semi-transparent background
+                                                color: Colors.black.withValues(
+                                                    alpha:
+                                                        0.5), // Semi-transparent background
                                                 borderRadius:
                                                     const BorderRadius.only(
                                                   bottomLeft: Radius.circular(
@@ -208,7 +208,7 @@ class _ManageStockScreenState extends State<ManageStockScreen> {
                                               padding:
                                                   const EdgeInsets.all(1.0),
                                               child: Text(
-                                                stock.position
+                                                stock.inventoryPosition
                                                     .toString(), // "Pick Image" in Thai
                                                 style: const TextStyle(
                                                   color: Colors.white,

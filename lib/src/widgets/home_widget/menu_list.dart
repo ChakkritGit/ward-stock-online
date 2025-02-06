@@ -111,38 +111,38 @@ class MenuList extends StatelessWidget {
                     ),
                   ),
                 ),
-                CustomGap.mediumWidthGap,
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      custom_route.Routes.settings,
-                    );
-                  },
-                  child: Container(
-                    color: Colors.transparent,
-                    padding: const EdgeInsets.all(20),
-                    height: 150.0,
-                    width: 150.0,
-                    child: const Column(
-                      children: [
-                        Icon(
-                          Icons.settings,
-                          size: 64.0,
-                          color: Colors.white,
-                        ),
-                        CustomGap.smallHeightGap,
-                        Text(
-                          'ตั้งค่า',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24.0,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                // CustomGap.mediumWidthGap,
+                // GestureDetector(
+                //   onTap: () {
+                //     Navigator.pushNamed(
+                //       context,
+                //       custom_route.Routes.settings,
+                //     );
+                //   },
+                //   child: Container(
+                //     color: Colors.transparent,
+                //     padding: const EdgeInsets.all(20),
+                //     height: 150.0,
+                //     width: 150.0,
+                //     child: const Column(
+                //       children: [
+                //         Icon(
+                //           Icons.settings,
+                //           size: 64.0,
+                //           color: Colors.white,
+                //         ),
+                //         CustomGap.smallHeightGap,
+                //         Text(
+                //           'ตั้งค่า',
+                //           style: TextStyle(
+                //             color: Colors.white,
+                //             fontSize: 24.0,
+                //           ),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           )),

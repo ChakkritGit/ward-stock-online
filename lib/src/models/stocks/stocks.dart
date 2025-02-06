@@ -1,47 +1,59 @@
-import 'package:vending_standalone/src/models/drugs/drug_model.dart';
-
 class Stocks {
-  final String id;
-  final int position;
-  final int qty;
-  final int minQty;
-  final int maxQty;
-  final int status;
-  final Drugs? drug;
+  final String inventoryId;
+  final int inventoryPosition;
+  final int inventoryQty;
+  final int inventoryMin;
+  final int inventoryMAX;
+  final bool inventoryStatus;
+  final String drugId;
+  final String drugName;
+  final String drugUnit;
+  final String drugImage;
+  final int drugPriority;
 
   Stocks({
-    required this.id,
-    required this.position,
-    required this.qty,
-    required this.minQty,
-    required this.maxQty,
-    required this.status,
-    this.drug,
+    required this.inventoryId,
+    required this.inventoryPosition,
+    required this.inventoryQty,
+    required this.inventoryMin,
+    required this.inventoryMAX,
+    required this.inventoryStatus,
+    required this.drugId,
+    required this.drugName,
+    required this.drugUnit,
+    required this.drugImage,
+    required this.drugPriority,
   });
 
   factory Stocks.fromMap(Map<String, dynamic> map) {
     return Stocks(
-      id: map['inventoryId'] ?? '',
-      position: map['inventoryPosition'] ?? 0,
-      qty: map['inventoryQty'] ?? 0,
-      minQty: map['inventoryMin'] ?? 0,
-      maxQty: map['inventoryMAX'] ?? 0,
-      status: map['inventoryStatus'] ?? 0,
-      drug: map['drugId'] != null
-          ? Drugs.fromMap(map)
-          : null, // Check if there's drug info
+      inventoryId: map['inventoryId'] ?? '',
+      inventoryPosition: map['inventoryPosition'] ?? '',
+      inventoryQty: map['inventoryQty'] ?? '',
+      inventoryMin: map['inventoryMin'] ?? '',
+      inventoryMAX: map['inventoryMAX'] ?? '',
+      inventoryStatus: map['inventoryStatus'] ?? true,
+      drugId: map['drugId'] ?? '',
+      drugName: map['drugName'] ?? '',
+      drugUnit: map['drugUnit'] ?? '',
+      drugImage: map['drugImage'] ?? '',
+      drugPriority: map['drugPriority'] ?? 0,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'inventoryId': id,
-      'inventoryPosition': position,
-      'inventoryQty': qty,
-      'inventoryMin': minQty,
-      'inventoryMAX': maxQty,
-      'inventoryStatus': status,
-      'drug': drug?.toMap(),
+      'inventoryId': inventoryId,
+      'inventoryPosition': inventoryPosition,
+      'inventoryQty': inventoryQty,
+      'inventoryMin': inventoryMin,
+      'inventoryMAX': inventoryMAX,
+      'inventoryStatus': inventoryStatus,
+      'drugId': inventoryStatus,
+      'drugName': drugName,
+      'drugUnit': drugUnit,
+      'drugImage': drugImage,
+      'drugPriority': drugPriority,
     };
   }
 }

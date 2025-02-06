@@ -1,6 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:vending_standalone/src/api/dio_helper.dart';
 import 'package:vending_standalone/src/constants/style.dart';
-import 'package:vending_standalone/src/database/db_helper.dart';
 import 'package:vending_standalone/src/models/stocks/stocks.dart';
 import 'package:vending_standalone/src/widgets/md_widget/label_text.dart';
 import 'package:vending_standalone/src/widgets/utils/scaffold_message.dart';
@@ -19,7 +23,7 @@ class _AddStockFormState extends State<AddStockForm> {
 
   @override
   void initState() {
-    currentQty = widget.stock?.qty ?? 0;
+    currentQty = widget.stock?.inventoryQty ?? 0;
     inventoryQty = TextEditingController(text: currentQty.toString());
     super.initState();
   }
@@ -31,7 +35,7 @@ class _AddStockFormState extends State<AddStockForm> {
   }
 
   void increaseQty() {
-    if (currentQty < widget.stock!.maxQty) {
+    if (currentQty < widget.stock!.inventoryMAX) {
       setState(() {
         currentQty++;
         inventoryQty.text = currentQty.toString();
@@ -48,19 +52,41 @@ class _AddStockFormState extends State<AddStockForm> {
     }
   }
 
-  Future handleSubmit(BuildContext context) async {
+  Future handleSubmit(BuildContext context, String id) async {
     if (inventoryQty.text.isNotEmpty) {
       int qty = int.parse(inventoryQty.text);
-      if (qty <= widget.stock!.maxQty) {
-        var result = await DatabaseHelper.instance.updateStock(
-            context,
-            {
-              'inventoryQty': inventoryQty.text,
-              'updatedAt': DateTime.now().toIso8601String(),
-            },
-            widget.stock?.id);
-        // ignore: use_build_context_synchronously
-        if (result) Navigator.of(context).pop();
+      if (qty <= widget.stock!.inventoryMAX) {
+        try {
+          final body = {'inventoryQty': int.parse(inventoryQty.text)};
+          final response =
+              await DioHelper().dio.patch('/group-inventory/stock/$id', data: body);
+
+          ScaffoldMessage.show(context, Icons.check_circle_outline_rounded,
+              'Group are saved', 's');
+          await DioHelper.instance.fetchStock(context);
+          if (response.statusCode == 200) Navigator.of(context).pop();
+        } catch (error) {
+          if (error is DioException) {
+            if (error.response != null) {
+              ScaffoldMessage.show(
+                  context,
+                  Icons.error_outline_rounded,
+                  '${error.response?.statusCode} - ${error.response?.data['message']}',
+                  'e');
+              if (kDebugMode) {
+                print('Error Message: ${error.response?.data}');
+              }
+            } else {
+              if (kDebugMode) {
+                print('DioError: ${error.message}');
+              }
+            }
+          } else {
+            if (kDebugMode) {
+              print('General error: $error');
+            }
+          }
+        }
       } else {
         ScaffoldMessage.show(context, Icons.warning_amber_rounded,
             'จำนวนที่กรอกมากกว่าจำนวนที่ใส่ได้สูงสุด', 'w');
@@ -121,8 +147,9 @@ class _AddStockFormState extends State<AddStockForm> {
                 child: IconButton(
                   iconSize: 48,
                   icon: const Icon(Icons.add),
-                  onPressed:
-                      currentQty < widget.stock!.maxQty ? increaseQty : null,
+                  onPressed: currentQty < widget.stock!.inventoryMAX
+                      ? increaseQty
+                      : null,
                 ),
               ),
             ],
@@ -133,7 +160,7 @@ class _AddStockFormState extends State<AddStockForm> {
             height: CustomInputStyle.inputHeight,
             decoration: CustomInputStyle.buttonBoxdecoration,
             child: TextButton(
-              onPressed: () => handleSubmit(context),
+              onPressed: () => handleSubmit(context, widget.stock!.inventoryId),
               child: const Text(
                 "บันทึก",
                 style: CustomInputStyle.textButtonStyle,

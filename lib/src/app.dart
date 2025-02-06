@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:vending_standalone/src/constants/style.dart';
 import 'package:vending_standalone/src/configs/routes.dart' as custom_route;
-import 'package:vending_standalone/src/database/db_helper.dart';
 import 'package:vending_standalone/src/models/users/user_local_model.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -15,18 +14,10 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  Future<void> initialData() async {
-    // await DatabaseHelper.instance.getDrugs(context);
-    // await DatabaseHelper.instance.getInventory(context);
-    // await DatabaseHelper.instance.getMachine(context);
-    // await DatabaseHelper.instance.getGroup(context);
-    await DatabaseHelper.instance.getInventoryWithDrug(context);
-  }
 
   @override
   void initState() {
     super.initState();
-    initialData();
   }
 
   @override

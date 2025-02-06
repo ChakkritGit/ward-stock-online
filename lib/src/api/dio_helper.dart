@@ -15,6 +15,7 @@ import 'package:vending_standalone/src/models/drugs/drug_model.dart';
 import 'package:vending_standalone/src/models/inventory/inventory.dart';
 import 'package:vending_standalone/src/models/machine/machine_model.dart';
 import 'package:vending_standalone/src/models/order/order_model.dart';
+import 'package:vending_standalone/src/models/stocks/stocks.dart';
 import 'package:vending_standalone/src/models/users/user_local_model.dart';
 import 'package:vending_standalone/src/models/users/user_model.dart';
 import 'package:vending_standalone/src/widgets/utils/scaffold_message.dart';
@@ -254,6 +255,48 @@ class DioHelper {
         context.read<DrugBloc>().add(DrugInventoryList(drugInventoryList: machineList));
       } else {
         context.read<DrugBloc>().add(const DrugInventoryList(drugInventoryList: []));
+      }
+    } catch (error) {
+      if (error is DioException) {
+        if (error.response != null) {
+          if (error.response?.statusCode == 401) {
+            await StoredLocal.instance.handleUnauthorized(context);
+            return;
+          }
+          ScaffoldMessage.show(
+            context,
+            Icons.error_outline_rounded,
+            '${error.response?.statusCode} - ${error.response?.data['message']}',
+            'e',
+          );
+          if (kDebugMode) {
+            print('Error Message: ${error.response?.data}');
+          }
+        } else {
+          if (kDebugMode) {
+            print('DioError: ${error.message}');
+          }
+        }
+      } else {
+        if (kDebugMode) {
+          print('General error: $error');
+        }
+      }
+    }
+  }
+
+  Future<void> fetchStock(BuildContext context) async {
+    try {
+      final response = await DioHelper.instance.dio.get('/group-inventory/stock');
+      if (response.data['data'].isNotEmpty) {
+        List<Stocks> machineList = (response.data['data'] as List)
+            .map((map) => Stocks.fromMap(map as Map<String, dynamic>))
+            .toList()
+            .cast<Stocks>();
+
+        context.read<InventoryBloc>().add(StockList(stockList: machineList));
+      } else {
+        context.read<InventoryBloc>().add(const StockList(stockList: []));
       }
     } catch (error) {
       if (error is DioException) {

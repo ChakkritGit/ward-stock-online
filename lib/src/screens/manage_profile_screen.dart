@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vending_standalone/src/blocs/users/user_bloc.dart';
-import 'package:vending_standalone/src/database/db_helper.dart';
 import 'package:vending_standalone/src/screens/profile_screen.dart';
 import 'package:vending_standalone/src/widgets/md_widget/app_bar.dart';
 
@@ -14,10 +13,6 @@ class ManageProfileScreen extends StatefulWidget {
 
 class _ManageProfileScreenState extends State<ManageProfileScreen> {
   String title = '';
-
-  Future getUserLogin(String id) async {
-    await DatabaseHelper.instance.getLoginLog(context, id);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +28,7 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
                 setState(() {
                   title = user.display ?? 'โปรไฟล์';
                 });
-                getUserLogin(user.id);
+
               }
             });
 

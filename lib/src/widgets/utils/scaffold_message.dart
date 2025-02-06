@@ -45,17 +45,17 @@ class ScaffoldMessage {
             : success.toLowerCase() == 'e'
                 ? ColorsTheme.error
                 : ColorsTheme.warning,
-        action: SnackBarAction(
-          label: 'ปิด',
-          textColor: success.toLowerCase() == 's'
-              ? Colors.black
-              : success.toLowerCase() == 'e'
-                  ? Colors.white
-                  : Colors.black,
-          onPressed: () {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          },
-        ),
+        // action: SnackBarAction(
+        //   label: 'ปิด',
+        //   textColor: success.toLowerCase() == 's'
+        //       ? Colors.black
+        //       : success.toLowerCase() == 'e'
+        //           ? Colors.white
+        //           : Colors.black,
+        //   onPressed: () {
+        //     ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        //   },
+        // ),
       ),
     );
   }
