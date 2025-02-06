@@ -8,7 +8,6 @@ import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:vending_standalone/src/api/dio_helper.dart';
 import 'package:vending_standalone/src/blocs/inventory/inventory_bloc.dart';
 import 'package:vending_standalone/src/constants/colors.dart';
-import 'package:vending_standalone/src/constants/instants_dropdown.dart';
 import 'package:vending_standalone/src/constants/style.dart';
 import 'package:vending_standalone/src/models/drugs/drug_list_model.dart';
 import 'package:vending_standalone/src/models/drugs/drug_model.dart';
@@ -70,6 +69,7 @@ class _AddGroupFormState extends State<AddGroupForm> {
         ScaffoldMessage.show(context, Icons.check_circle_outline_rounded,
             'Group are saved', 's');
         await DioHelper.instance.fetchGroupInventory(context);
+        await DioHelper.instance.fetchStock(context);
         if (response.statusCode == 201) Navigator.of(context).pop();
       } catch (error) {
         if (error is DioException) {
@@ -127,7 +127,7 @@ class _AddGroupFormState extends State<AddGroupForm> {
         ScaffoldMessage.show(context, Icons.check_circle_outline_rounded,
             'Group are edited', 's');
         await DioHelper.instance.fetchGroupInventory(context);
-        await InventoryPosition.getInventory(context);
+        await DioHelper.instance.fetchStock(context);
         if (response.statusCode == 200) Navigator.of(context).pop();
       } catch (error) {
         if (error is DioException) {

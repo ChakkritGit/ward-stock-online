@@ -115,38 +115,82 @@ class _ManageStockScreenState extends State<ManageStockScreen> {
                                     ),
                                     CustomGap.smallHeightGap,
                                     // แสดงจำนวนคงเหลือพร้อมสีเตือน
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 4.0,
-                                        horizontal: 8.0,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                        border: Border.all(
-                                          color: isOutOfStock
-                                              ? Colors.red
-                                              : isLowQty
-                                                  ? Colors.orange
-                                                  : Colors
-                                                      .grey, // กรอบเปลี่ยนสี
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        'จำนวนคงเหลือ ${stock.inventoryQty.toString()}',
-                                        style: TextStyle(
-                                          fontSize: 18.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: isOutOfStock
-                                              ? Colors.red // แสดงสีแดงถ้าหมด
-                                              : isLowQty
+                                    Row(
+                                      spacing: 10.0,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 4.0,
+                                            horizontal: 8.0,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            border: Border.all(
+                                              color: isOutOfStock
+                                                  ? Colors.red
+                                                  : isLowQty
+                                                      ? Colors.orange
+                                                      : Colors
+                                                          .grey, // กรอบเปลี่ยนสี
+                                              width: 2.0,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            'จำนวนคงเหลือ ${stock.inventoryQty.toString()}',
+                                            style: TextStyle(
+                                              fontSize: 18.0,
+                                              fontWeight: FontWeight.bold,
+                                              color: isOutOfStock
                                                   ? Colors
-                                                      .orange // แสดงสีส้มถ้าต่ำกว่า minQty
-                                                  : Colors.black,
+                                                      .red // แสดงสีแดงถ้าหมด
+                                                  : isLowQty
+                                                      ? Colors
+                                                          .orange // แสดงสีส้มถ้าต่ำกว่า minQty
+                                                      : Colors.black,
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    ),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 4.0,
+                                            horizontal: 8.0,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: stock.drugPriority == 1
+                                                ? Colors.transparent
+                                                : stock.drugPriority == 2
+                                                    ? Colors.yellow
+                                                    : Colors.pink,
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            border: Border.all(
+                                              color: stock.drugPriority == 1
+                                                  ? ColorsTheme.grey
+                                                  : stock.drugPriority == 2
+                                                      ? Colors.yellow
+                                                      : Colors.pink,
+                                              width: 1.5,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            stock.drugPriority == 1
+                                                ? 'ยาทั่วไป'
+                                                : stock.drugPriority == 2
+                                                    ? 'ยา HAD'
+                                                    : 'ยา Narcotic',
+                                            style: TextStyle(
+                                              fontSize: 18.0,
+                                              color: stock.drugPriority == 1
+                                                  ? Colors.black
+                                                  : stock.drugPriority == 2
+                                                      ? Colors.black
+                                                      : Colors.white,
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    )
                                   ],
                                 ),
                                 subtitle: Column(

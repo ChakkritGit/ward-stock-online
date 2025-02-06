@@ -3,7 +3,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vending_standalone/src/api/dio_helper.dart';
+import 'package:vending_standalone/src/blocs/users/user_bloc.dart';
 import 'package:vending_standalone/src/constants/style.dart';
 import 'package:vending_standalone/src/models/stocks/stocks.dart';
 import 'package:vending_standalone/src/widgets/md_widget/label_text.dart';
@@ -52,14 +54,110 @@ class _AddStockFormState extends State<AddStockForm> {
     }
   }
 
-  Future handleSubmit(BuildContext context, String id) async {
+  Future handleSubmit(BuildContext context, String id, int priority) async {
+    final userData = context.read<UserBloc>().state.userData;
     if (inventoryQty.text.isNotEmpty) {
+      if ((priority == 2 || priority == 3) && userData[0].role == 'ADMIN') {
+        bool isConfirmed = await showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            TextEditingController usernameController = TextEditingController();
+            TextEditingController passwordController = TextEditingController();
+
+            return AlertDialog(
+              title: const Text("ยืนยันตัวตน"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: usernameController,
+                    decoration: const InputDecoration(labelText: "Username"),
+                  ),
+                  TextField(
+                    controller: passwordController,
+                    decoration: const InputDecoration(labelText: "Password"),
+                    obscureText: true,
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: const Text("ปฏิเสธ"),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    if (usernameController.text == "admin" &&
+                        passwordController.text == "1234") {
+                      Navigator.of(context).pop(true);
+                    } else {
+                      ScaffoldMessage.show(context, Icons.error_outline_rounded,
+                          'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'e');
+                    }
+                  },
+                  child: const Text("อนุญาต"),
+                ),
+              ],
+            );
+          },
+        );
+
+        if (!isConfirmed) {
+          ScaffoldMessage.show(
+              context, Icons.error_outline_rounded, 'การอนุมัติถูกปฏิเสธ', 'e');
+          return;
+        }
+
+        bool isFinalConfirmed = await showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("ยืนยันการเพิ่มจำนวนยา"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("ชื่อยา: ${widget.stock!.drugName}"),
+                  Text("หน่วย: ${widget.stock!.drugUnit}"),
+                  Text("จำนวนที่เพิ่ม: ${inventoryQty.text}"),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: const Text("ปฏิเสธ"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: const Text("ยืนยัน"),
+                ),
+              ],
+            );
+          },
+        );
+
+        if (!isFinalConfirmed) {
+          ScaffoldMessage.show(context, Icons.warning_amber_rounded,
+              'การเพิ่มจำนวนถูกยกเลิก', 'w');
+          return;
+        }
+      }
+
       int qty = int.parse(inventoryQty.text);
       if (qty <= widget.stock!.inventoryMAX) {
         try {
-          final body = {'inventoryQty': int.parse(inventoryQty.text)};
-          final response =
-              await DioHelper().dio.patch('/group-inventory/stock/$id', data: body);
+          final body = {'inventoryQty': qty};
+          final response = await DioHelper()
+              .dio
+              .patch('/group-inventory/stock/$id', data: body);
 
           ScaffoldMessage.show(context, Icons.check_circle_outline_rounded,
               'Group are saved', 's');
@@ -160,7 +258,8 @@ class _AddStockFormState extends State<AddStockForm> {
             height: CustomInputStyle.inputHeight,
             decoration: CustomInputStyle.buttonBoxdecoration,
             child: TextButton(
-              onPressed: () => handleSubmit(context, widget.stock!.inventoryId),
+              onPressed: () => handleSubmit(context, widget.stock!.inventoryId,
+                  widget.stock!.drugPriority),
               child: const Text(
                 "บันทึก",
                 style: CustomInputStyle.textButtonStyle,
