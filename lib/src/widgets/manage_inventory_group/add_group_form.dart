@@ -6,12 +6,14 @@ import 'package:vending_standalone/src/constants/colors.dart';
 import 'package:vending_standalone/src/constants/style.dart';
 import 'package:vending_standalone/src/database/db_helper.dart';
 import 'package:vending_standalone/src/models/drugs/drug_list_model.dart';
+import 'package:vending_standalone/src/models/drugs/drug_model.dart';
+import 'package:vending_standalone/src/models/inventory/inventory.dart';
 import 'package:vending_standalone/src/widgets/md_widget/label_text.dart';
 import 'package:vending_standalone/src/widgets/utils/scaffold_message.dart';
 
 class AddGroupForm extends StatefulWidget {
-  final List<Map<String, dynamic>> drugs;
-  final List<Map<String, dynamic>> inventory;
+  final List<Drugs> drugs;
+  final List<Inventories> inventory;
   final DrugGroup? group;
   const AddGroupForm(
       {super.key, required this.drugs, required this.inventory, this.group});
@@ -76,7 +78,7 @@ class _AddGroupFormState extends State<AddGroupForm> {
         groupMax.text.isNotEmpty) {
       var result = await DatabaseHelper.instance.updateGroupAndInventory(
         context,
-        widget.group?.groupId,
+        widget.group?.groupid,
         drugId: selectedDrugId,
         inventories: createInventoryList(),
         groupMin: groupMin.text,
@@ -92,7 +94,7 @@ class _AddGroupFormState extends State<AddGroupForm> {
   bool isSameFloor(List<String> inventoryIds) {
     List<int> positions = inventoryIds
         .map((id) => widget.inventory.firstWhere(
-            (inventory) => inventory['id'] == id)['inventoryPosition'] as int)
+            (inventory) => inventory.id == id).position)
         .toList();
 
     int floor = (positions.first - 1) ~/ 10;
@@ -102,10 +104,10 @@ class _AddGroupFormState extends State<AddGroupForm> {
 
   @override
   void initState() {
-    groupMin = TextEditingController(text: widget.group?.groupMin.toString());
-    groupMax = TextEditingController(text: widget.group?.groupMax.toString());
+    groupMin = TextEditingController(text: widget.group?.groupmin.toString());
+    groupMax = TextEditingController(text: widget.group?.groupmax.toString());
     if (widget.group != null) {
-      selectedDrugId = widget.group?.drugId;
+      selectedDrugId = widget.group?.drugid;
       for (var drugPos in widget.group!.inventoryList) {
         selectedInventoryIds.add(drugPos.inventoryId);
       }
@@ -146,19 +148,19 @@ class _AddGroupFormState extends State<AddGroupForm> {
               items: [
                 if (widget.group != null)
                   DropdownMenuItem<String>(
-                    value: widget.group!.drugId,
+                    value: widget.group!.drugid,
                     child: Text(
-                      widget.group!.drugName,
+                      widget.group!.drugname,
                       style: const TextStyle(fontSize: 20.0),
                     ),
                   ),
                 ...widget.drugs
-                    .where((drug) => drug['id'] != widget.group?.drugId)
+                    .where((drug) => drug.id != widget.group?.drugid)
                     .map((drug) {
                   return DropdownMenuItem<String>(
-                    value: drug['id'],
+                    value: drug.id,
                     child: Text(
-                      drug['drugName'],
+                      drug.drugName,
                       style: const TextStyle(fontSize: 20.0),
                     ),
                   );
@@ -198,11 +200,11 @@ class _AddGroupFormState extends State<AddGroupForm> {
                   }),
                 ...widget.inventory
                     .where((inventory) =>
-                        !selectedInventoryIds.contains(inventory['id']))
+                        !selectedInventoryIds.contains(inventory.id))
                     .map((inventory) {
                   return MultiSelectItem<String>(
-                    inventory['id'],
-                    'ช่องที่ ${inventory['inventoryPosition']}',
+                    inventory.id,
+                    'ช่องที่ ${inventory.position}',
                   );
                 }),
               ],

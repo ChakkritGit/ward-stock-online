@@ -1,18 +1,18 @@
 class DrugInventory {
   final String inventoryId;
-  final int? inventoryPosition;
-  int? inventoryQty;
+  final int inventoryPosition;
+  final int inventoryQty;
 
   DrugInventory({
     required this.inventoryId,
-    this.inventoryPosition,
-    this.inventoryQty,
+    required this.inventoryPosition,
+    required this.inventoryQty,
   });
 
   factory DrugInventory.fromJson(Map<String, dynamic> json) {
     return DrugInventory(
       inventoryId: json['inventoryId'],
-      inventoryPosition: json['inventoryPosition'] ?? 0,
+      inventoryPosition: json['inventoryPosition'],
       inventoryQty: json['inventoryQty'],
     );
   }
@@ -27,57 +27,57 @@ class DrugInventory {
 }
 
 class DrugGroup {
-  final String groupId;
-  final String drugId;
-  final String drugName;
-  final String drugImage;
-  final String drugUnit;
-  final int? drugPriority;
-  final int? groupMin;
-  final int? groupMax;
+  final String groupid;
+  final String drugid;
+  final String drugname;
+  final String drugimage;
+  final String drugunit;
+  final int? drugpriority;
+  final int? groupmin;
+  final int? groupmax;
   final List<DrugInventory> inventoryList;
 
   DrugGroup({
-    required this.groupId,
-    required this.drugId,
-    required this.drugName,
-    required this.drugImage,
-    required this.drugUnit,
-    required this.drugPriority,
-    required this.groupMin,
-    required this.groupMax,
+    required this.groupid,
+    required this.drugid,
+    required this.drugname,
+    required this.drugimage,
+    required this.drugunit,
+    required this.drugpriority,
+    required this.groupmin,
+    required this.groupmax,
     required this.inventoryList,
   });
 
-  factory DrugGroup.fromJson(Map<String, dynamic> json) {
+  factory DrugGroup.fromMap(Map<String, dynamic> json) {
     var inventoryListFromJson = json['inventoryList'] as List?;
     List<DrugInventory> inventoryList =
         inventoryListFromJson?.map((i) => DrugInventory.fromJson(i)).toList() ??
             [];
 
     return DrugGroup(
-      groupId: json['groupId'] ?? '',
-      drugId: json['drugId'] ?? '',
-      drugName: json['drugName'] ?? '',
-      drugImage: json['drugImage'] ?? '',
-      drugUnit: json['drugUnit'] ?? '',
-      drugPriority: json['drugPriority'] ?? 0,
-      groupMin: json['groupMin'] ?? 0,
-      groupMax: json['groupMax'] ?? 0,
+      groupid: json['groupid'] ?? '',
+      drugid: json['drugid'] ?? '',
+      drugname: json['drugname'] ?? '',
+      drugimage: json['drugimage'] ?? '',
+      drugunit: json['drugunit'] ?? '',
+      drugpriority: json['drugpriority'] ?? 0,
+      groupmin: json['groupmin'] ?? 0,
+      groupmax: json['groupmax'] ?? 0,
       inventoryList: inventoryList,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'groupId': groupId,
-      'drugId': drugId,
-      'drugName': drugName,
-      'drugImage': drugImage,
-      'drugUnit': drugUnit,
-      'drugPriority': drugPriority,
-      'groupMin': groupMin,
-      'groupMax': groupMax,
+      'groupid': groupid,
+      'drugid': drugid,
+      'drugname': drugname,
+      'drugimage': drugimage,
+      'drugunit': drugunit,
+      'drugpriority': drugpriority,
+      'groupmin': groupmin,
+      'groupmax': groupmax,
       'inventoryList': inventoryList.map((i) => i.toJson()).toList(),
     };
   }

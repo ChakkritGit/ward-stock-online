@@ -5,12 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vending_standalone/src/blocs/drug/drug_bloc.dart';
 import 'package:vending_standalone/src/blocs/inventory/inventory_bloc.dart';
+import 'package:vending_standalone/src/blocs/machine/machine_bloc.dart';
 import 'package:vending_standalone/src/blocs/order/order_bloc.dart';
 import 'package:vending_standalone/src/blocs/users/user_bloc.dart';
 import 'package:vending_standalone/src/constants/env.dart';
 import 'package:vending_standalone/src/constants/initail_store.dart';
+import 'package:vending_standalone/src/models/drugs/drug_list_model.dart';
 import 'package:vending_standalone/src/models/drugs/drug_model.dart';
 import 'package:vending_standalone/src/models/inventory/inventory.dart';
+import 'package:vending_standalone/src/models/machine/machine_model.dart';
 import 'package:vending_standalone/src/models/order/order_model.dart';
 import 'package:vending_standalone/src/models/users/user_local_model.dart';
 import 'package:vending_standalone/src/models/users/user_model.dart';
@@ -167,6 +170,90 @@ class DioHelper {
         context
             .read<InventoryBloc>()
             .add(const InventoryList(inventoryList: []));
+      }
+    } catch (error) {
+      if (error is DioException) {
+        if (error.response != null) {
+          if (error.response?.statusCode == 401) {
+            await StoredLocal.instance.handleUnauthorized(context);
+            return;
+          }
+          ScaffoldMessage.show(
+            context,
+            Icons.error_outline_rounded,
+            '${error.response?.statusCode} - ${error.response?.data['message']}',
+            'e',
+          );
+          if (kDebugMode) {
+            print('Error Message: ${error.response?.data}');
+          }
+        } else {
+          if (kDebugMode) {
+            print('DioError: ${error.message}');
+          }
+        }
+      } else {
+        if (kDebugMode) {
+          print('General error: $error');
+        }
+      }
+    }
+  }
+
+  Future<void> fetchMachine(BuildContext context) async {
+    try {
+      final response = await DioHelper.instance.dio.get('/machine');
+      if (response.data['data'].isNotEmpty) {
+        List<Machines> machineList = (response.data['data'] as List)
+            .map((map) => Machines.fromMap(map as Map<String, dynamic>))
+            .toList()
+            .cast<Machines>();
+
+        context.read<MachineBloc>().add(MachineList(machineList: machineList));
+      } else {
+        context.read<MachineBloc>().add(const MachineList(machineList: []));
+      }
+    } catch (error) {
+      if (error is DioException) {
+        if (error.response != null) {
+          if (error.response?.statusCode == 401) {
+            await StoredLocal.instance.handleUnauthorized(context);
+            return;
+          }
+          ScaffoldMessage.show(
+            context,
+            Icons.error_outline_rounded,
+            '${error.response?.statusCode} - ${error.response?.data['message']}',
+            'e',
+          );
+          if (kDebugMode) {
+            print('Error Message: ${error.response?.data}');
+          }
+        } else {
+          if (kDebugMode) {
+            print('DioError: ${error.message}');
+          }
+        }
+      } else {
+        if (kDebugMode) {
+          print('General error: $error');
+        }
+      }
+    }
+  }
+
+  Future<void> fetchGroupInventory(BuildContext context) async {
+    try {
+      final response = await DioHelper.instance.dio.get('/group-inventory');
+      if (response.data['data'].isNotEmpty) {
+        List<DrugGroup> machineList = (response.data['data'] as List)
+            .map((map) => DrugGroup.fromMap(map as Map<String, dynamic>))
+            .toList()
+            .cast<DrugGroup>();
+
+        context.read<DrugBloc>().add(DrugInventoryList(drugInventoryList: machineList));
+      } else {
+        context.read<DrugBloc>().add(const DrugInventoryList(drugInventoryList: []));
       }
     } catch (error) {
       if (error is DioException) {

@@ -1,11 +1,12 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vending_standalone/src/api/dio_helper.dart';
 import 'package:vending_standalone/src/blocs/inventory/inventory_bloc.dart';
 import 'package:vending_standalone/src/constants/colors.dart';
 import 'package:vending_standalone/src/constants/style.dart';
-import 'package:vending_standalone/src/database/db_helper.dart';
 import 'package:vending_standalone/src/models/inventory/inventory.dart';
 import 'package:vending_standalone/src/screens/add_inventory.dart';
 import 'package:vending_standalone/src/widgets/md_widget/floating_button.dart';
@@ -90,18 +91,26 @@ class _ManageInventoryScreenState extends State<ManageInventoryScreen> {
                 ),
               ),
               onPressed: () async {
-                var resulst = await DatabaseHelper.instance
-                    .deleteInventory(context, inventoryId);
+                try {
+                  var resulst = await DioHelper.instance.dio
+                      .delete('/inventory/$inventoryId');
 
-                if (resulst) {
-                  ScaffoldMessage.show(
-                      context,
-                      Icons.check_circle_outline_rounded,
-                      'ช่องที่ $inventoryPosition ถูกลบแล้ว',
-                      's');
-                  Navigator.of(context).pop(true);
-                } else {
+                  if (resulst.data['data'].isNotEmpty) {
+                    await DioHelper.instance.fetchInventory(context);
+                    ScaffoldMessage.show(
+                        context,
+                        Icons.check_circle_outline_rounded,
+                        'ช่องที่ $inventoryPosition ถูกลบแล้ว',
+                        's');
+                    Navigator.of(context).pop(true);
+                  } else {
+                    Navigator.of(context).pop(false);
+                  }
+                } catch (error) {
                   Navigator.of(context).pop(false);
+                  if (kDebugMode) {
+                    print(error);
+                  }
                 }
               },
             ),
@@ -142,8 +151,7 @@ class _ManageInventoryScreenState extends State<ManageInventoryScreen> {
                         final inventory = inventoryList[index];
 
                         // เช็คจำนวนคงเหลือต่ำกว่า minQty หรือ เท่ากับ 0
-                        bool isLowQty =
-                            inventory.qty <= inventory.min;
+                        bool isLowQty = inventory.qty <= inventory.min;
                         bool isOutOfStock = inventory.qty == 0;
 
                         return Dismissible(
@@ -181,8 +189,8 @@ class _ManageInventoryScreenState extends State<ManageInventoryScreen> {
                                       ),
                                     );
                                   },
-                                  splashColor:
-                                      ColorsTheme.primary.withValues(alpha: 0.3),
+                                  splashColor: ColorsTheme.primary
+                                      .withValues(alpha: 0.3),
                                   title: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -253,8 +261,7 @@ class _ManageInventoryScreenState extends State<ManageInventoryScreen> {
                                       width: 70.0,
                                       child: Center(
                                         child: Text(
-                                          inventory.position
-                                              .toString(),
+                                          inventory.position.toString(),
                                           style: const TextStyle(
                                             fontSize: 48.0,
                                             color: ColorsTheme.grey,

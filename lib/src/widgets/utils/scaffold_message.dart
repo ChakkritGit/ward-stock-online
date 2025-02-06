@@ -11,46 +11,32 @@ class ScaffoldMessage {
       SnackBar(
         duration: const Duration(seconds: 3),
         content: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                Icon(
-                  icon,
+            Icon(
+              icon,
+              color: success.toLowerCase() == 's'
+                  ? Colors.black
+                  : success.toLowerCase() == 'e'
+                      ? Colors.white
+                      : Colors.black,
+              size: 34.0,
+            ),
+            CustomGap.smallWidthGap_1,
+            Expanded(
+              child: Text(
+                message,
+                style: TextStyle(
+                  fontSize: 24.0,
                   color: success.toLowerCase() == 's'
                       ? Colors.black
                       : success.toLowerCase() == 'e'
                           ? Colors.white
                           : Colors.black,
-                  size: 34.0,
                 ),
-                CustomGap.smallWidthGap_1,
-                Text(
-                  message,
-                  style: TextStyle(
-                    fontSize: 24.0,
-                    color: success.toLowerCase() == 's'
-                        ? Colors.black
-                        : success.toLowerCase() == 'e'
-                            ? Colors.white
-                            : Colors.black,
-                  ),
-                ),
-              ],
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.close_rounded,
-                color: success.toLowerCase() == 's'
-                    ? Colors.black
-                    : success.toLowerCase() == 'e'
-                        ? Colors.white
-                        : Colors.black,
-                size: 42.0,
+                softWrap: true,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
               ),
-              onPressed: () {
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-              },
             ),
           ],
         ),
@@ -59,6 +45,17 @@ class ScaffoldMessage {
             : success.toLowerCase() == 'e'
                 ? ColorsTheme.error
                 : ColorsTheme.warning,
+        action: SnackBarAction(
+          label: 'ปิด',
+          textColor: success.toLowerCase() == 's'
+              ? Colors.black
+              : success.toLowerCase() == 'e'
+                  ? Colors.white
+                  : Colors.black,
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
       ),
     );
   }

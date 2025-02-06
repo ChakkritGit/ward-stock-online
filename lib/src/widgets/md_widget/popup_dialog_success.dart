@@ -63,7 +63,7 @@ class _PopupDialogSuccessState extends State<PopupDialogSuccess>
     try {
       await DatabaseHelper.instance
           .updateStockOrder(context, widget.itemsToUpdate);
-      await DatabaseHelper.instance.addOrder(widget.order, widget.user);
+      // await DatabaseHelper.instance.addOrder(widget.order, widget.user);
     } catch (error) {
       if (kDebugMode) {
         print("เกิดข้อผิดพลาดในการอัปเดตสต็อก: $error");

@@ -45,7 +45,7 @@ class _ManageGroupScreenState extends State<ManageGroupScreen> {
 
     setState(() {
       filteredGroups = groupList.where((grp) {
-        final drugName = grp.drugName.toLowerCase();
+        final drugName = grp.drugname.toLowerCase();
         final inventoryPosition = grp.inventoryList.toString();
         return drugName.contains(query) || inventoryPosition.contains(query);
       }).toList();
@@ -142,7 +142,7 @@ class _ManageGroupScreenState extends State<ManageGroupScreen> {
                       itemBuilder: (context, index) {
                         final group = groupList[index];
                         return Dismissible(
-                          key: Key(group.groupId),
+                          key: Key(group.groupid),
                           background: Container(
                             color: Colors.red,
                             alignment: Alignment.centerRight,
@@ -156,8 +156,8 @@ class _ManageGroupScreenState extends State<ManageGroupScreen> {
                           direction: DismissDirection.endToStart,
                           confirmDismiss: (direction) async =>
                               await deleteGroup(
-                            group.groupId,
-                            group.drugName,
+                            group.groupid,
+                            group.drugname,
                           ),
                           child: Material(
                             color: Colors.transparent,
@@ -170,20 +170,20 @@ class _ManageGroupScreenState extends State<ManageGroupScreen> {
                                       MaterialPageRoute(
                                         builder: (context) => AddGroup(
                                           titleText:
-                                              'แก้ไขกรุ๊ป ${group.drugName}',
+                                              'แก้ไขกรุ๊ป ${group.drugname}',
                                           group: group,
                                         ),
                                       ),
                                     );
                                   },
-                                  splashColor:
-                                      ColorsTheme.primary.withValues(alpha: 0.3),
+                                  splashColor: ColorsTheme.primary
+                                      .withValues(alpha: 0.3),
                                   title: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        group.drugName,
+                                        group.drugname,
                                         style: const TextStyle(
                                           fontSize: 20.0,
                                           fontWeight: FontWeight.bold,
@@ -193,14 +193,14 @@ class _ManageGroupScreenState extends State<ManageGroupScreen> {
                                       Row(
                                         children: [
                                           Text(
-                                            'Min ${group.groupMin.toString()}',
+                                            'Min ${group.groupmin.toString()}',
                                             style: const TextStyle(
                                               fontSize: 18.0,
                                             ),
                                           ),
                                           CustomGap.smallWidthGap,
                                           Text(
-                                            'Max ${group.groupMax.toString()}',
+                                            'Max ${group.groupmax.toString()}',
                                             style: const TextStyle(
                                               fontSize: 18.0,
                                             ),
@@ -250,7 +250,8 @@ class _ManageGroupScreenState extends State<ManageGroupScreen> {
                                   leading: SizedBox(
                                     width: 100.0,
                                     child: Center(
-                                      child: ImageFile(file: group.drugImage),
+                                      child:
+                                          ImageNetwork(file: group.drugimage),
                                     ),
                                   ),
                                   trailing: const Icon(

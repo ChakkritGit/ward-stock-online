@@ -17,13 +17,10 @@ import 'package:vending_standalone/src/blocs/drug/drug_bloc.dart';
 import 'package:vending_standalone/src/blocs/inventory/inventory_bloc.dart';
 import 'package:vending_standalone/src/blocs/machine/machine_bloc.dart';
 import 'package:vending_standalone/src/blocs/users/user_bloc.dart';
-import 'package:vending_standalone/src/models/dispense/dispense_order_model.dart';
-import 'package:vending_standalone/src/models/drugs/drug_list_model.dart';
 import 'package:vending_standalone/src/models/drugs/drug_model.dart';
 import 'package:vending_standalone/src/models/machine/machine_model.dart';
 import 'package:vending_standalone/src/models/stocks/stocks.dart';
 import 'package:vending_standalone/src/models/users/user_login_model.dart';
-import 'package:vending_standalone/src/models/users/user_model.dart';
 import 'package:vending_standalone/src/widgets/utils/scaffold_message.dart';
 import 'package:uuid/uuid.dart';
 
@@ -484,7 +481,7 @@ class DatabaseHelper {
             });
           }
 
-          await getGroup(context, txn: txn);
+          // await getGroup(context, txn: txn);
           await getInventoryWithDrug(context, txn: txn);
 
           ScaffoldMessage.show(context, Icons.check_circle_outline_rounded,
@@ -531,7 +528,7 @@ class DatabaseHelper {
     try {
       await db.update('drugs', row, where: 'id = ?', whereArgs: [drugId]);
       await getDrugs(context);
-      await getGroup(context);
+      // await getGroup(context);
       ScaffoldMessage.show(
           context, Icons.check_circle_outline_rounded, 'แก้ไขยาสำเร็จ', 's');
       return true;
@@ -550,7 +547,7 @@ class DatabaseHelper {
     try {
       await db.update('inventory', row, where: 'id = ?', whereArgs: [invId]);
       // await getInventory(context);
-      await getGroup(context);
+      // await getGroup(context);
       ScaffoldMessage.show(
           context, Icons.check_circle_outline_rounded, 'แก้ไขช่องสำเร็จ', 's');
       return true;
@@ -665,7 +662,7 @@ class DatabaseHelper {
             }
           }
 
-          await getGroup(context, txn: txn);
+          // await getGroup(context, txn: txn);
           await getInventoryWithDrug(context, txn: txn);
 
           ScaffoldMessage.show(context, Icons.check_circle_outline_rounded,
@@ -694,7 +691,7 @@ class DatabaseHelper {
     try {
       await db.update('inventory', row, where: 'id = ?', whereArgs: [invId]);
       // await getInventory(context);
-      await getGroup(context);
+      // await getGroup(context);
       await getInventoryWithDrug(context);
       ScaffoldMessage.show(context, Icons.check_circle_outline_rounded,
           'อัปเดทสต๊อกสำเร็จ', 's');
@@ -736,7 +733,7 @@ class DatabaseHelper {
         }
 
         // await getInventory(context, txn: txn);
-        await getGroup(context, txn: txn);
+        // await getGroup(context, txn: txn);
         await getInventoryWithDrug(context, txn: txn);
       });
 
@@ -755,57 +752,57 @@ class DatabaseHelper {
     }
   }
 
-  Future<bool> addOrder(Dispense order, Users user) async {
-    Database db = await instance.database;
-    int remainingQty = order.qty;
-    List<Map<String, dynamic>> itemsToUpdate = [];
+  // Future<bool> addOrder(Dispense order, Users user) async {
+  //   Database db = await instance.database;
+  //   int remainingQty = order.qty;
+  //   List<Map<String, dynamic>> itemsToUpdate = [];
 
-    try {
-      for (var inventory in order.drug.inventoryList) {
-        if (remainingQty <= 0) break;
+  //   try {
+  //     for (var inventory in order.drug.inventoryList) {
+  //       if (remainingQty <= 0) break;
 
-        int inventoryQty = inventory.inventoryQty ?? 0;
-        int qtyToDeduct = 0;
+  //       int inventoryQty = inventory.inventoryQty ?? 0;
+  //       int qtyToDeduct = 0;
 
-        if (remainingQty > inventoryQty) {
-          qtyToDeduct = inventoryQty;
-          remainingQty -= inventoryQty;
-          inventory.inventoryQty = 0;
-        } else {
-          qtyToDeduct = remainingQty;
-          inventory.inventoryQty = inventoryQty - remainingQty;
-          remainingQty = 0;
-        }
+  //       if (remainingQty > inventoryQty) {
+  //         qtyToDeduct = inventoryQty;
+  //         remainingQty -= inventoryQty;
+  //         inventory.inventoryQty = 0;
+  //       } else {
+  //         qtyToDeduct = remainingQty;
+  //         inventory.inventoryQty = inventoryQty - remainingQty;
+  //         remainingQty = 0;
+  //       }
 
-        itemsToUpdate.add({
-          'inventoryId': inventory.inventoryId,
-          'quantity': qtyToDeduct,
-        });
-      }
+  //       itemsToUpdate.add({
+  //         'inventoryId': inventory.inventoryId,
+  //         'quantity': qtyToDeduct,
+  //       });
+  //     }
 
-      for (var newItems in itemsToUpdate) {
-        Map<String, dynamic> row = {
-          'id': 'OID-${const Uuid().v4()}',
-          'userId': user.id,
-          'drugId': order.drug.drugId,
-          'inventoryId': newItems['inventoryId'],
-          'orderQty': newItems['quantity'],
-          'comment': '',
-          'createdAt': DateTime.now().toIso8601String(),
-          'updatedAt': DateTime.now().toIso8601String(),
-        };
+  //     for (var newItems in itemsToUpdate) {
+  //       Map<String, dynamic> row = {
+  //         'id': 'OID-${const Uuid().v4()}',
+  //         'userId': user.id,
+  //         'drugId': order.drug.drugId,
+  //         'inventoryId': newItems['inventoryId'],
+  //         'orderQty': newItems['quantity'],
+  //         'comment': '',
+  //         'createdAt': DateTime.now().toIso8601String(),
+  //         'updatedAt': DateTime.now().toIso8601String(),
+  //       };
 
-        await db.insert('orders', row);
-      }
+  //       await db.insert('orders', row);
+  //     }
 
-      return true;
-    } catch (error) {
-      if (kDebugMode) {
-        print(error);
-      }
-      rethrow;
-    }
-  }
+  //     return true;
+  //   } catch (error) {
+  //     if (kDebugMode) {
+  //       print(error);
+  //     }
+  //     rethrow;
+  //   }
+  // }
 
   // ดึงข้อมูล
   // Future<bool> fetchUsers(BuildContext context) async {
@@ -953,101 +950,101 @@ class DatabaseHelper {
   //   }
   // }
 
-  Future<bool> getGroup(BuildContext context, {Transaction? txn}) async {
-    Database db = await instance.database;
-    List<Map<String, dynamic>> groups = [];
+  // Future<bool> getGroup(BuildContext context, {Transaction? txn}) async {
+  //   Database db = await instance.database;
+  //   List<Map<String, dynamic>> groups = [];
 
-    try {
-      final result = await (txn != null ? txn.rawQuery('''
-      SELECT
-        g.id AS groupId,
-        g.drugId,
-        d.drugName,
-        d.drugImage,
-        d.drugPriority,
-        d.drugUnit,
-        gi.inventoryId,
-        gi.min as groupMin,
-        gi.max as groupMax,
-        i.inventoryPosition,
-        i.inventoryQty
-      FROM `group` g
-      INNER JOIN group_inventory gi ON g.id = gi.groupId
-      INNER JOIN inventory i ON gi.inventoryId = i.id
-      INNER JOIN drugs d ON g.drugId = d.id
-      ORDER BY g.id DESC, i.inventoryPosition ASC;
-    ''') : db.rawQuery('''
-      SELECT
-        g.id AS groupId,
-        g.drugId,
-        d.drugName,
-        d.drugImage,
-        d.drugPriority,
-        d.drugUnit,
-        gi.inventoryId,
-        gi.min as groupMin,
-        gi.max as groupMax,
-        i.inventoryPosition,
-        i.inventoryQty
-      FROM `group` g
-      INNER JOIN group_inventory gi ON g.id = gi.groupId
-      INNER JOIN inventory i ON gi.inventoryId = i.id
-      INNER JOIN drugs d ON g.drugId = d.id
-      ORDER BY g.id DESC, i.inventoryPosition ASC;
-    '''));
+  //   try {
+  //     final result = await (txn != null ? txn.rawQuery('''
+  //     SELECT
+  //       g.id AS groupId,
+  //       g.drugId,
+  //       d.drugName,
+  //       d.drugImage,
+  //       d.drugPriority,
+  //       d.drugUnit,
+  //       gi.inventoryId,
+  //       gi.min as groupMin,
+  //       gi.max as groupMax,
+  //       i.inventoryPosition,
+  //       i.inventoryQty
+  //     FROM `group` g
+  //     INNER JOIN group_inventory gi ON g.id = gi.groupId
+  //     INNER JOIN inventory i ON gi.inventoryId = i.id
+  //     INNER JOIN drugs d ON g.drugId = d.id
+  //     ORDER BY g.id DESC, i.inventoryPosition ASC;
+  //   ''') : db.rawQuery('''
+  //     SELECT
+  //       g.id AS groupId,
+  //       g.drugId,
+  //       d.drugName,
+  //       d.drugImage,
+  //       d.drugPriority,
+  //       d.drugUnit,
+  //       gi.inventoryId,
+  //       gi.min as groupMin,
+  //       gi.max as groupMax,
+  //       i.inventoryPosition,
+  //       i.inventoryQty
+  //     FROM `group` g
+  //     INNER JOIN group_inventory gi ON g.id = gi.groupId
+  //     INNER JOIN inventory i ON gi.inventoryId = i.id
+  //     INNER JOIN drugs d ON g.drugId = d.id
+  //     ORDER BY g.id DESC, i.inventoryPosition ASC;
+  //   '''));
 
-      if (result.isNotEmpty) {
-        for (var item in result) {
-          var existingGroup = groups.firstWhere(
-            (group) => group['groupId'] == item['groupId'],
-            orElse: () => <String, dynamic>{},
-          );
+  //     if (result.isNotEmpty) {
+  //       for (var item in result) {
+  //         var existingGroup = groups.firstWhere(
+  //           (group) => group['groupId'] == item['groupId'],
+  //           orElse: () => <String, dynamic>{},
+  //         );
 
-          if (existingGroup.isNotEmpty) {
-            existingGroup['inventoryList'].add({
-              'inventoryId': item['inventoryId'],
-              'inventoryPosition': item['inventoryPosition'],
-              'inventoryQty': item['inventoryQty'],
-            });
-          } else {
-            groups.add({
-              'groupId': item['groupId'],
-              'drugId': item['drugId'],
-              'drugName': item['drugName'],
-              'drugImage': item['drugImage'],
-              'drugPriority': item['drugPriority'],
-              'drugUnit': item['drugUnit'],
-              'groupMin': item['groupMin'],
-              'groupMax': item['groupMax'],
-              'inventoryList': [
-                {
-                  'inventoryId': item['inventoryId'],
-                  'inventoryPosition': item['inventoryPosition'],
-                  'inventoryQty': item['inventoryQty'],
-                }
-              ]
-            });
-          }
-        }
+  //         if (existingGroup.isNotEmpty) {
+  //           existingGroup['inventoryList'].add({
+  //             'inventoryId': item['inventoryId'],
+  //             'inventoryPosition': item['inventoryPosition'],
+  //             'inventoryQty': item['inventoryQty'],
+  //           });
+  //         } else {
+  //           groups.add({
+  //             'groupId': item['groupId'],
+  //             'drugId': item['drugId'],
+  //             'drugName': item['drugName'],
+  //             'drugImage': item['drugImage'],
+  //             'drugPriority': item['drugPriority'],
+  //             'drugUnit': item['drugUnit'],
+  //             'groupMin': item['groupMin'],
+  //             'groupMax': item['groupMax'],
+  //             'inventoryList': [
+  //               {
+  //                 'inventoryId': item['inventoryId'],
+  //                 'inventoryPosition': item['inventoryPosition'],
+  //                 'inventoryQty': item['inventoryQty'],
+  //               }
+  //             ]
+  //           });
+  //         }
+  //       }
 
-        List<DrugGroup> groupList =
-            groups.map((map) => DrugGroup.fromJson(map)).toList();
-        context
-            .read<DrugBloc>()
-            .add(DrugInventoryList(drugInventoryList: groupList));
-      } else {
-        context
-            .read<DrugBloc>()
-            .add(const DrugInventoryList(drugInventoryList: []));
-      }
-      return true;
-    } catch (error) {
-      if (kDebugMode) {
-        print(error);
-      }
-      rethrow;
-    }
-  }
+  //       List<DrugGroup> groupList =
+  //           groups.map((map) => DrugGroup.fromMap(map)).toList();
+  //       context
+  //           .read<DrugBloc>()
+  //           .add(DrugInventoryList(drugInventoryList: groupList));
+  //     } else {
+  //       context
+  //           .read<DrugBloc>()
+  //           .add(const DrugInventoryList(drugInventoryList: []));
+  //     }
+  //     return true;
+  //   } catch (error) {
+  //     if (kDebugMode) {
+  //       print(error);
+  //     }
+  //     rethrow;
+  //   }
+  // }
 
   Future<bool> getInventoryWithDrug(BuildContext context,
       {Transaction? txn}) async {
@@ -1365,7 +1362,7 @@ ORDER BY
               await txn.delete('group', where: 'id = ?', whereArgs: [id]);
 
           if (res1 >= 1 && res2 >= 1) {
-            await getGroup(context, txn: txn);
+            // await getGroup(context, txn: txn);
             await getInventoryWithDrug(context, txn: txn);
             return true;
           } else {

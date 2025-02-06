@@ -10,7 +10,7 @@ class SecurityQuestions {
 
 class SecurityUserStatus {
   static final List<Map<String, dynamic>> status = [
-    {'label': 'เปิดใช้งาน', 'value': 0},
-    {'label': 'ปิดใช้งาน', 'value': 1},
+    {'label': 'เปิดใช้งาน', 'value': true},
+    {'label': 'ปิดใช้งาน', 'value': false},
   ];
 }

@@ -1,15 +1,18 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:vending_standalone/src/api/dio_helper.dart';
 import 'package:vending_standalone/src/constants/style.dart';
-import 'package:vending_standalone/src/database/db_helper.dart';
 import 'package:vending_standalone/src/models/inventory/inventory.dart';
+import 'package:vending_standalone/src/models/machine/machine_model.dart';
 import 'package:vending_standalone/src/widgets/md_widget/label_text.dart';
 import 'package:vending_standalone/src/widgets/utils/scaffold_message.dart';
 
 class AddInventoryForm extends StatefulWidget {
   final List<Map<String, dynamic>> availablePositions;
-  final List<Map<String, dynamic>> machines;
+  final List<Machines> machines;
   final Inventories? inventory;
   const AddInventoryForm(
       {super.key,
@@ -25,43 +28,100 @@ class _AddInventoryFormState extends State<AddInventoryForm> {
   int? selectedPosition;
   String? selectedMachineId;
 
-  // late TextEditingController inventoryQty;
   late TextEditingController inventoryMin;
   late TextEditingController inventoryMAX;
+  bool isLoading = false;
 
   Future handleSubmit(BuildContext context) async {
     if (selectedPosition != null &&
         selectedMachineId != null &&
-        // inventoryQty.text.isNotEmpty &&
         inventoryMin.text.isNotEmpty &&
         inventoryMAX.text.isNotEmpty) {
-      var resulst = await DatabaseHelper.instance.createInventory(context, {
-        'inventoryPosition': selectedPosition,
-        'inventoryQty': 0,
-        'inventoryMin': inventoryMin.text,
-        'inventoryMAX': inventoryMAX.text,
-        'machineId': selectedMachineId,
-        'createdAt': DateTime.now().toIso8601String(),
-        'updatedAt': DateTime.now().toIso8601String(),
-      });
-      if (resulst) Navigator.of(context).pop();
+      try {
+        final body = {
+          'position': selectedPosition,
+          'min': int.tryParse(inventoryMin.text),
+          'max': int.tryParse(inventoryMAX.text),
+          'machineId': selectedMachineId
+        };
+        final response = await DioHelper().dio.post('/inventory', data: body);
+
+        ScaffoldMessage.show(context, Icons.check_circle_outline_rounded,
+            'Inventory are saved', 's');
+        await DioHelper.instance.fetchInventory(context);
+        if (response.statusCode == 201) Navigator.of(context).pop();
+      } catch (error) {
+        if (error is DioException) {
+          if (error.response != null) {
+            ScaffoldMessage.show(
+                context,
+                Icons.error_outline_rounded,
+                '${error.response?.statusCode} - ${error.response?.data['message']}',
+                'e');
+            if (kDebugMode) {
+              print('Error Message: ${error.response?.data}');
+            }
+          } else {
+            if (kDebugMode) {
+              print('DioError: ${error.message}');
+            }
+          }
+        } else {
+          if (kDebugMode) {
+            print('General error: $error');
+          }
+        }
+      } finally {
+        setState(() {
+          isLoading = false;
+        });
+      }
     } else {
       ScaffoldMessage.show(
           context, Icons.warning_amber_rounded, 'กรุณากรอกข้อมุลให้ครบ', 'w');
     }
   }
 
-  Future handleSubmitEdit(BuildContext context) async {
-    if (inventoryMin.text.isNotEmpty && inventoryMAX.text.isNotEmpty) {
-      var resulst = await DatabaseHelper.instance.updateInventory(
-          context,
-          {
-            'inventoryMin': inventoryMin.text,
-            'inventoryMAX': inventoryMAX.text,
-            'updatedAt': DateTime.now().toIso8601String(),
-          },
-          widget.inventory?.id);
-      if (resulst) Navigator.of(context).pop();
+  Future handleSubmitEdit(BuildContext context, String id) async {
+    if (inventoryMin.text.isNotEmpty &&
+        inventoryMAX.text.isNotEmpty) {
+      try {
+        final body = {
+          'min': int.tryParse(inventoryMin.text),
+          'max': int.tryParse(inventoryMAX.text)
+        };
+        final response = await DioHelper().dio.patch('/inventory/$id', data: body);
+
+        ScaffoldMessage.show(context, Icons.check_circle_outline_rounded,
+            'Inventory are edited', 's');
+        await DioHelper.instance.fetchInventory(context);
+        if (response.statusCode == 200) Navigator.of(context).pop();
+      } catch (error) {
+        if (error is DioException) {
+          if (error.response != null) {
+            ScaffoldMessage.show(
+                context,
+                Icons.error_outline_rounded,
+                '${error.response?.statusCode} - ${error.response?.data['message']}',
+                'e');
+            if (kDebugMode) {
+              print('Error Message: ${error.response?.data}');
+            }
+          } else {
+            if (kDebugMode) {
+              print('DioError: ${error.message}');
+            }
+          }
+        } else {
+          if (kDebugMode) {
+            print('General error: $error');
+          }
+        }
+      } finally {
+        setState(() {
+          isLoading = false;
+        });
+      }
     } else {
       ScaffoldMessage.show(
           context, Icons.warning_amber_rounded, 'กรุณากรอกข้อมุลให้ครบ', 'w');
@@ -135,26 +195,6 @@ class _AddInventoryFormState extends State<AddInventoryForm> {
                     CustomGap.smallHeightGap,
                   ],
                 ),
-          // CustomGap.smallHeightGap,
-          // const Padding(
-          //   padding: CustomPadding.paddingAll_10,
-          //   child: CustomLabel(text: 'จำนวน'),
-          // ),
-          // Container(
-          //   height: CustomInputStyle.inputHeight,
-          //   margin: CustomMargin.marginSymmetricVertical_1,
-          //   padding: CustomPadding.paddingSymmetricInput,
-          //   decoration: CustomInputStyle.inputBoxdecoration,
-          //   child: TextFormField(
-          //     controller: inventoryQty,
-          //     keyboardType: TextInputType.number,
-          //     style: CustomInputStyle.inputStyle,
-          //     decoration: const InputDecoration(
-          //       border: InputBorder.none,
-          //       hintStyle: CustomInputStyle.inputHintStyle,
-          //     ),
-          //   ),
-          // ),
           const Padding(
             padding: CustomPadding.paddingAll_10,
             child: CustomLabel(text: 'Min'),
@@ -218,9 +258,9 @@ class _AddInventoryFormState extends State<AddInventoryForm> {
                         value: selectedMachineId,
                         items: widget.machines.map((machine) {
                           return DropdownMenuItem<String>(
-                            value: machine['id'],
+                            value: machine.id,
                             child: Text(
-                              machine['machineName'],
+                              machine.machineName,
                               style: const TextStyle(fontSize: 20.0),
                             ),
                           );
@@ -243,7 +283,7 @@ class _AddInventoryFormState extends State<AddInventoryForm> {
             decoration: CustomInputStyle.buttonBoxdecoration,
             child: TextButton(
               onPressed: () => widget.inventory != null
-                  ? handleSubmitEdit(context)
+                  ? handleSubmitEdit(context, widget.inventory!.id)
                   : handleSubmit(context),
               child: const Text(
                 "บันทึก",

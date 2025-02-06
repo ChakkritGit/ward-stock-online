@@ -1,11 +1,12 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vending_standalone/src/api/dio_helper.dart';
 import 'package:vending_standalone/src/blocs/machine/machine_bloc.dart';
 import 'package:vending_standalone/src/constants/colors.dart';
 import 'package:vending_standalone/src/constants/style.dart';
-import 'package:vending_standalone/src/database/db_helper.dart';
 import 'package:vending_standalone/src/models/machine/machine_model.dart';
 import 'package:vending_standalone/src/screens/add_machine.dart';
 import 'package:vending_standalone/src/widgets/md_widget/app_bar.dart';
@@ -90,18 +91,26 @@ class _ManageMachineScreenState extends State<ManageMachineScreen> {
                 ),
               ),
               onPressed: () async {
-                var resulst =
-                    await DatabaseHelper.instance.deleteMachine(context, id);
+                try {
+                  var resulst =
+                      await DioHelper.instance.dio.delete('/machine/$id');
 
-                if (resulst) {
-                  ScaffoldMessage.show(
-                      context,
-                      Icons.check_circle_outline_rounded,
-                      'เครื่อง $name ถูกลบแล้ว',
-                      's');
-                  Navigator.of(context).pop(true);
-                } else {
+                  if (resulst.data['data'].isNotEmpty) {
+                    await DioHelper.instance.fetchMachine(context);
+                    ScaffoldMessage.show(
+                        context,
+                        Icons.check_circle_outline_rounded,
+                        'เครื่อง $name ถูกลบแล้ว',
+                        's');
+                    Navigator.of(context).pop(true);
+                  } else {
+                    Navigator.of(context).pop(false);
+                  }
+                } catch (error) {
                   Navigator.of(context).pop(false);
+                  if (kDebugMode) {
+                    print(error);
+                  }
                 }
               },
             ),
@@ -187,7 +196,7 @@ class _ManageMachineScreenState extends State<ManageMachineScreen> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         CustomGap.smallHeightGap,
-                                        machine.machineStatus == 0
+                                        machine.status
                                             ? Container(
                                                 padding:
                                                     const EdgeInsets.symmetric(

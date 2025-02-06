@@ -1,7 +1,9 @@
 class Machines {
   final String id;
   final String machineName;
-  final int machineStatus;
+  final String location;
+  final int capacity;
+  final bool status;
   final String comment;
   final String createdAt;
   final String updatedAt;
@@ -9,7 +11,9 @@ class Machines {
   Machines({
     required this.id,
     required this.machineName,
-    required this.machineStatus,
+    required this.location,
+    required this.capacity,
+    required this.status,
     required this.comment,
     required this.createdAt,
     required this.updatedAt,
@@ -19,7 +23,9 @@ class Machines {
     return {
       'id': id,
       'machineName': machineName,
-      'machineStatus': machineStatus,
+      'location': location,
+      'capacity': capacity,
+      'machineStatus': status,
       'comment': comment,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
@@ -30,7 +36,9 @@ class Machines {
     return Machines(
       id: map['id'] as String? ?? '',
       machineName: map['machineName'] as String? ?? '',
-      machineStatus: map['machineStatus'] as int? ?? 0,
+      location: map['location'] as String? ?? '',
+      capacity: map['capacity'] as int? ?? 60,
+      status: map['status'] as bool? ?? true,
       comment: map['comment'] as String? ?? '',
       createdAt: map['createdAt'] as String? ?? '',
       updatedAt: map['updatedAt'] as String? ?? '',

@@ -2,10 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vending_standalone/src/api/dio_helper.dart';
 // import 'package:vending_standalone/src/api/dio_helper.dart';
 import 'package:vending_standalone/src/blocs/order/order_bloc.dart';
 import 'package:vending_standalone/src/constants/colors.dart';
 import 'package:vending_standalone/src/constants/style.dart';
+import 'package:vending_standalone/src/models/order/order_model.dart';
 import 'package:vending_standalone/src/services/RabbitMQ.dart';
 
 class PrescriptionOrderCardWidget extends StatelessWidget {
@@ -14,7 +16,60 @@ class PrescriptionOrderCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final dioHelper = DioHelper();
+    final dioHelper = DioHelper();
+
+    void showPrescriptionModal(
+        BuildContext context, Prescription prescription) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: Colors.white,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Text('รายการยา (HN: ${prescription.hn})'),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: prescription.order.length,
+                itemBuilder: (context, index) {
+                  final order = prescription.order[index];
+                  return ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.blue.shade100,
+                      child: Text('${index + 1}'),
+                    ),
+                    title: Text(order.drugName),
+                    subtitle: Text('จำนวน: ${order.qty} ${order.unit}'),
+                    trailing: Icon(
+                      order.status == 'complete'
+                          ? Icons.check_circle
+                          : Icons.pending,
+                      color: order.status == 'complete'
+                          ? Colors.green
+                          : Colors.orange,
+                    ),
+                  );
+                },
+              ),
+            ),
+            actions: [
+              TextButton(
+                child: const Text(
+                  'ปิด',
+                  style: TextStyle(
+                    fontSize: 24.0,
+                  ),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
     return BlocBuilder<OrderBloc, OrderState>(
       builder: (context, state) {
         if (state.orderList.isNotEmpty) {
@@ -142,10 +197,10 @@ class PrescriptionOrderCardWidget extends StatelessWidget {
                                         ),
                                         child: Text(
                                           order.drugPriority == 1
-                                              ? 'ยาทั่วไป'
+                                              ? 'Normal'
                                               : order.drugPriority == 2
-                                                  ? 'ยา HAD'
-                                                  : 'ยา Narcotic',
+                                                  ? 'HAD'
+                                                  : 'Narcotic',
                                           style: TextStyle(
                                               fontSize: 18.0,
                                               color: order.drugPriority == 1
@@ -157,7 +212,6 @@ class PrescriptionOrderCardWidget extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-
                                   SizedBox(
                                       width: 125.0,
                                       child: order.status == 'pending'
@@ -248,18 +302,27 @@ class PrescriptionOrderCardWidget extends StatelessWidget {
                                                         ),
                                                       ),
                                                     )),
-                                  // IconButton(
-                                  //   onPressed: () async {
-                                  //     await dioHelper.dio.get(
-                                  //         '/dispense/order/status/complete/${order.id}/${order.prescriptionId}');
-                                  //     rabbitMQ.acknowledgeMessage();
-                                  //     await dioHelper.fetchOrder(context);
-                                  //   },
-                                  //   icon: const Icon(
-                                  //     Icons.check,
-                                  //     size: 32.0,
-                                  //   ),
-                                  // )
+                                  IconButton(
+                                    onPressed: () async {
+                                      final response = await dioHelper.dio.get(
+                                          '/dispense/order/status/complete/${order.id}/${order.prescriptionId}');
+                                      rabbitMQ.acknowledgeMessage();
+                                      await dioHelper.fetchOrder(context);
+
+                                      if (response.data['data'] != null) {
+                                        final prescription =
+                                            Prescription.fromJson(
+                                                response.data['data']);
+
+                                        showPrescriptionModal(
+                                            context, prescription);
+                                      }
+                                    },
+                                    icon: const Icon(
+                                      Icons.check,
+                                      size: 32.0,
+                                    ),
+                                  )
                                 ],
                               ),
                             ),

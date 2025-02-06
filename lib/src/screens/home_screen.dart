@@ -201,6 +201,8 @@ class _HomeScreenState extends State<HomeScreen> {
       await dioHelper.fetchOrder(context);
       await dioHelper.fetchDrugs(context);
       await dioHelper.fetchInventory(context);
+      await dioHelper.fetchMachine(context);
+      await dioHelper.fetchGroupInventory(context);
       setState(() {
         loading = false;
       });

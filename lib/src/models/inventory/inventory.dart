@@ -5,7 +5,6 @@ class Inventories {
   final int min;
   final int max;
   final bool status;
-  final String drugId;
   final String machineId;
   final String comment;
   final String createdAt;
@@ -18,7 +17,6 @@ class Inventories {
     required this.min,
     required this.max,
     required this.status,
-    required this.drugId,
     required this.machineId,
     required this.comment,
     required this.createdAt,
@@ -33,7 +31,6 @@ class Inventories {
       min: map['min'] as int? ?? 0,
       max: map['max'] as int? ?? 0,
       status: map['status'] as bool? ?? false,
-      drugId: map['drugId'] as String? ?? '',
       machineId: map['machineId'] as String? ?? '',
       comment: map['comment'] as String? ?? '',
       createdAt: map['createdAt'] as String? ?? '',
@@ -49,7 +46,6 @@ class Inventories {
       'min': min,
       'max': max,
       'status': status,
-      'drugId': drugId,
       'machineId': machineId,
       'comment': comment,
       'createdAt': createdAt,

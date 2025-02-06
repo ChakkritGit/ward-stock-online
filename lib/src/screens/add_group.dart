@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:vending_standalone/src/constants/instants_dropdown.dart';
 import 'package:vending_standalone/src/constants/style.dart';
 import 'package:vending_standalone/src/models/drugs/drug_list_model.dart';
+import 'package:vending_standalone/src/models/drugs/drug_model.dart';
+import 'package:vending_standalone/src/models/inventory/inventory.dart';
 import 'package:vending_standalone/src/widgets/manage_inventory_group/add_group_form.dart';
 import 'package:vending_standalone/src/widgets/md_widget/app_bar.dart';
 
@@ -17,12 +19,14 @@ class AddGroup extends StatefulWidget {
 }
 
 class _AddGroupState extends State<AddGroup> {
-  List<Map<String, dynamic>> drugs = [];
-  List<Map<String, dynamic>> inventory = [];
+  List<Drugs> drugs = [];
+  List<Inventories> inventory = [];
 
   Future<void> loadData() async {
-    drugs = await InventoryPosition.getAvailableDrug(context);
-    inventory = await InventoryPosition.getInventory(context);
+    final drugsData = await InventoryPosition.getAvailableDrug(context);
+    final inventoryData = await InventoryPosition.getInventory(context);
+    drugs = drugsData.map((map) => Drugs.fromMap(map)).toList();
+    inventory = inventoryData.map((map) => Inventories.fromMap(map)).toList();
     setState(() {});
   }
 
