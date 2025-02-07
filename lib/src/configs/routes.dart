@@ -7,7 +7,9 @@ import 'package:vending_standalone/src/screens/manage_machine_screen.dart';
 import 'package:vending_standalone/src/screens/manage_profile_screen.dart';
 import 'package:vending_standalone/src/screens/manage_settings_screen.dart';
 import 'package:vending_standalone/src/screens/manage_stock_screen.dart';
+import 'package:vending_standalone/src/screens/report_screen.dart';
 import 'package:vending_standalone/src/screens/screen_index.dart';
+import 'package:vending_standalone/src/widgets/report_widget/current_drug_inventory.dart';
 
 class Routes {
   static const home = '/home';
@@ -25,6 +27,8 @@ class Routes {
   static const addgroup = '/addgroup';
   static const settings = '/settings';
   static const profile = '/profile';
+  static const report = '/report';
+  static const reportCurrentDrug = '/report_current_drug';
 
   static const database = '/database';
 
@@ -46,5 +50,7 @@ class Routes {
     addgroup: (context) => const AddGroup(),
     settings: (context) => const ManageSettingsScreen(),
     profile: (context) => const ManageProfileScreen(),
+    report: (context) => const ReportScreen(),
+    reportCurrentDrug: (context) => const CurrentDrugInventoryReport(),
   };
 }

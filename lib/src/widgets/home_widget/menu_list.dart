@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:vending_standalone/src/constants/style.dart';
 import 'package:vending_standalone/src/configs/routes.dart' as custom_route;
@@ -51,9 +50,10 @@ class MenuList extends StatelessWidget {
                 CustomGap.mediumWidthGap,
                 GestureDetector(
                   onTap: () {
-                    if (kDebugMode) {
-                      print('รายงาน');
-                    }
+                    Navigator.pushNamed(
+                      context,
+                      custom_route.Routes.report,
+                    );
                   },
                   child: Container(
                     color: Colors.transparent,

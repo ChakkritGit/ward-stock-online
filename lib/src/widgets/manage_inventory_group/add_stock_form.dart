@@ -123,7 +123,52 @@ class _AddStockFormState extends State<AddStockForm> {
                 children: [
                   Text("ชื่อยา: ${widget.stock!.drugName}"),
                   Text("หน่วย: ${widget.stock!.drugUnit}"),
-                  Text("จำนวนที่เพิ่ม: ${inventoryQty.text}"),
+                  Text("จำนวนก่อนหน้า: ${widget.stock!.inventoryQty}"),
+                  Text(
+                      "จำนวนที่เพิ่ม: ${int.parse(inventoryQty.text) - widget.stock!.inventoryQty}"),
+                  Text("จำนวนหลังเพิ่ม: ${inventoryQty.text}"),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: const Text("ปฏิเสธ"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: const Text("ยืนยัน"),
+                ),
+              ],
+            );
+          },
+        );
+
+        if (!isFinalConfirmed) {
+          ScaffoldMessage.show(context, Icons.warning_amber_rounded,
+              'การเพิ่มจำนวนถูกยกเลิก', 'w');
+          return;
+        }
+      } else {
+        bool isFinalConfirmed = await showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("ยืนยันการเพิ่มจำนวนยา"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("ชื่อยา: ${widget.stock!.drugName}"),
+                  Text("หน่วย: ${widget.stock!.drugUnit}"),
+                  Text("จำนวนก่อนหน้า: ${widget.stock!.inventoryQty}"),
+                  Text(
+                      "จำนวนที่เพิ่ม: ${int.parse(inventoryQty.text) - widget.stock!.inventoryQty}"),
+                  Text("จำนวนหลังเพิ่ม: ${inventoryQty.text}"),
                 ],
               ),
               actions: [
