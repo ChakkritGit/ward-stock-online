@@ -101,6 +101,8 @@ class _AddDrugFormState extends State<AddDrugForm> {
         ScaffoldMessage.show(
             context, Icons.check_circle_outline_rounded, 'Drug are saved', 's');
         await DioHelper.instance.fetchDrugs(context);
+        await DioHelper.instance.fetchStock(context);
+        await DioHelper.instance.fetchGroupInventory(context);
         if (response.statusCode == 201) Navigator.of(context).pop();
       } catch (error) {
         if (error is DioException) {
@@ -180,6 +182,8 @@ class _AddDrugFormState extends State<AddDrugForm> {
         ScaffoldMessage.show(
             context, Icons.check_circle_outline_rounded, 'Drug are saved', 's');
         await DioHelper.instance.fetchDrugs(context);
+        await DioHelper.instance.fetchStock(context);
+        await DioHelper.instance.fetchGroupInventory(context);
         if (response.statusCode == 200) Navigator.of(context).pop();
       } catch (error) {
         if (error is DioException) {

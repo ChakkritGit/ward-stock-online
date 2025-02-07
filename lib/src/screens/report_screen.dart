@@ -56,7 +56,7 @@ class _ReportScreenState extends State<ReportScreen> {
                         ),
                       ),
                       title: const Text(
-                        "รายการยาคงเหลือ ณ ปัจจุบัน",
+                        "รายงานยาคงเหลือ",
                         style: TextStyle(
                           fontSize: 22.0,
                           fontWeight: FontWeight.bold,
@@ -79,7 +79,7 @@ class _ReportScreenState extends State<ReportScreen> {
                       onTap: () => {
                         Navigator.pushNamed(
                           context,
-                          custom_route.Routes.drug,
+                          custom_route.Routes.reportBelow,
                         )
                       },
                       splashColor: ColorsTheme.primary.withValues(alpha: 0.3),
@@ -100,7 +100,7 @@ class _ReportScreenState extends State<ReportScreen> {
                         ),
                       ),
                       title: const Text(
-                        "จัดการยา",
+                        "รายงานยาที่ต้องเติม",
                         style: TextStyle(
                           fontSize: 22.0,
                           fontWeight: FontWeight.bold,
@@ -123,7 +123,7 @@ class _ReportScreenState extends State<ReportScreen> {
                       onTap: () => {
                         Navigator.pushNamed(
                           context,
-                          custom_route.Routes.inventory,
+                          custom_route.Routes.reportLogDispense,
                         )
                       },
                       splashColor: ColorsTheme.primary.withValues(alpha: 0.3),
@@ -144,7 +144,7 @@ class _ReportScreenState extends State<ReportScreen> {
                         ),
                       ),
                       title: const Text(
-                        "จัดการสต๊อก",
+                        "รายงานการจ่ายยาย้อนหลัง",
                         style: TextStyle(
                           fontSize: 22.0,
                           fontWeight: FontWeight.bold,
@@ -167,7 +167,7 @@ class _ReportScreenState extends State<ReportScreen> {
                       onTap: () => {
                         Navigator.pushNamed(
                           context,
-                          custom_route.Routes.machine,
+                          custom_route.Routes.reportPrePack,
                         )
                       },
                       splashColor: ColorsTheme.primary.withValues(alpha: 0.3),
@@ -188,7 +188,7 @@ class _ReportScreenState extends State<ReportScreen> {
                         ),
                       ),
                       title: const Text(
-                        "จัดการเครื่อง",
+                        "รายงานการจ่ายยาไม่ระบุใบยา",
                         style: TextStyle(
                           fontSize: 22.0,
                           fontWeight: FontWeight.bold,

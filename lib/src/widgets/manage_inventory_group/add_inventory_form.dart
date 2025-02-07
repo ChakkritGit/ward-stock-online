@@ -49,6 +49,7 @@ class _AddInventoryFormState extends State<AddInventoryForm> {
         ScaffoldMessage.show(context, Icons.check_circle_outline_rounded,
             'Inventory are saved', 's');
         await DioHelper.instance.fetchInventory(context);
+        await DioHelper.instance.fetchStock(context);
         if (response.statusCode == 201) Navigator.of(context).pop();
       } catch (error) {
         if (error is DioException) {
@@ -95,6 +96,7 @@ class _AddInventoryFormState extends State<AddInventoryForm> {
         ScaffoldMessage.show(context, Icons.check_circle_outline_rounded,
             'Inventory are edited', 's');
         await DioHelper.instance.fetchInventory(context);
+        await DioHelper.instance.fetchStock(context);
         if (response.statusCode == 200) Navigator.of(context).pop();
       } catch (error) {
         if (error is DioException) {

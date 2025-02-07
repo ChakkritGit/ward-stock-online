@@ -1,15 +1,82 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'package:vending_standalone/src/blocs/inventory/inventory_bloc.dart';
+import 'package:vending_standalone/src/api/dio_helper.dart';
+import 'package:vending_standalone/src/constants/initail_store.dart';
 import 'package:vending_standalone/src/models/stocks/stocks.dart';
 import 'package:vending_standalone/src/widgets/md_widget/app_bar.dart';
+import 'package:pdf/widgets.dart' as pw;
 
-class CurrentDrugInventoryReport extends StatelessWidget {
-  const CurrentDrugInventoryReport({super.key});
+class InventoryBelow extends StatefulWidget {
+  const InventoryBelow({super.key});
+
+  @override
+  InventoryBelowState createState() => InventoryBelowState();
+}
+
+class InventoryBelowState extends State<InventoryBelow> {
+  List<Stocks> drugData = [];
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchDrugBelow();
+  }
+
+  Future<void> fetchDrugBelow() async {
+    try {
+      final response =
+          await DioHelper.instance.dio.get('/reports/below-min-max');
+      if (response.data['data'].isNotEmpty) {
+        List<Stocks> machineList = (response.data['data'] as List)
+            .map((map) => Stocks.fromMap(map as Map<String, dynamic>))
+            .toList();
+
+        setState(() {
+          drugData = machineList;
+          isLoading = true;
+        });
+      } else {
+        setState(() {
+          drugData = [];
+          isLoading = false;
+        });
+      }
+    } catch (error) {
+      if (error is DioException) {
+        if (error.response != null) {
+          if (error.response?.statusCode == 401) {
+            await StoredLocal.instance.handleUnauthorized(context);
+            return;
+          }
+          if (kDebugMode) {
+            print('Error Message: ${error.response?.data}');
+          }
+        } else {
+          if (kDebugMode) {
+            print('DioError: ${error.message}');
+          }
+        }
+      } else {
+        if (kDebugMode) {
+          print('General error: $error');
+        }
+      }
+      setState(() {
+        isLoading = false;
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   Future<Uint8List> generatePdf(List<Stocks> drugData) async {
     final pdf = pw.Document();
@@ -28,7 +95,7 @@ class CurrentDrugInventoryReport extends StatelessWidget {
         margin: const pw.EdgeInsets.all(30.0),
         header: (context) => pw.Center(
           child: pw.Text(
-            "รายงานยาคงเหลือ",
+            "รายงานยาที่ต้องเติม",
             style: pw.TextStyle(
               font: ttf,
               fontSize: 24,
@@ -144,15 +211,16 @@ class CurrentDrugInventoryReport extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Stocks> drugData = context.read<InventoryBloc>().state.stockList;
     return Scaffold(
       appBar: const CustomAppBar(
-        text: 'รายงานยาคงเหลือ',
+        text: 'รายงานยาที่ต้องเติม',
         isBottom: false,
       ),
-      body: PdfPreview(
-        build: (format) async => generatePdf(drugData),
-      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : PdfPreview(
+              build: (format) async => generatePdf(drugData),
+            ),
     );
   }
 }

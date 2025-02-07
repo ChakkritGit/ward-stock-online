@@ -165,7 +165,7 @@ class _AddUserFormState extends State<AddUserForm> {
             ? {
                 'display': displayName.text,
                 'role': selectedRole,
-                'status': selectedStatus,
+                'status': selectedStatus == 1 ? false : true,
                 'image': await MultipartFile.fromFile(
                   _imageFile!.path,
                   filename: _imageFile!.path.split('/').last,
@@ -174,7 +174,7 @@ class _AddUserFormState extends State<AddUserForm> {
             : {
                 'display': displayName.text,
                 'role': selectedRole,
-                'status': selectedStatus
+                'status': selectedStatus == 1 ? false : true
               });
         final response = await DioHelper().dio.patch(
               '/users/$id',
@@ -491,7 +491,7 @@ class _AddUserFormState extends State<AddUserForm> {
                         hint: const Text('เลือกสถานะ'),
                         items: SecurityUserStatus.status.map((question) {
                           return DropdownMenuItem<int>(
-                            value: question['value'],
+                            value: question['value'] ? 0 : 1,
                             child: Text(
                               question['label'],
                               style: const TextStyle(fontSize: 20.0),

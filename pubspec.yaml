@@ -91,7 +91,9 @@ flutter:
   assets:
     - lib/src/assets/images/
     - lib/src/assets/fonts/Anuphan-Regular.ttf
-    - lib/src/assets/pdf/test.pdf
+    - lib/src/assets/fonts/Anuphan-Bold.ttf
+    - lib/src/assets/pdf/log_dispense.pdf
+    - lib/src/assets/pdf/pre_pack.pdf
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
