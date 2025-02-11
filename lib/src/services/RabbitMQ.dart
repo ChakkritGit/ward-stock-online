@@ -59,7 +59,7 @@ class RabbitMQService {
           vending.connectPort();
         }
 
-        await Future.delayed(const Duration(seconds: 1));
+        await Future.delayed(const Duration(microseconds: 700));
 
         try {
           handleMessage(message.payloadAsString);
@@ -158,6 +158,7 @@ class RabbitMQService {
 
         if (!isConfirmed) {
           newMessage!.reject(true);
+          await vending.disconnectPort();
           ScaffoldMessage.show(
             context,
             Icons.error_outline_rounded,
