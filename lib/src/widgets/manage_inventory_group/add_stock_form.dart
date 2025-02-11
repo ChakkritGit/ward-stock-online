@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vending_standalone/src/api/dio_helper.dart';
 import 'package:vending_standalone/src/blocs/users/user_bloc.dart';
+import 'package:vending_standalone/src/constants/initail_store.dart';
 import 'package:vending_standalone/src/constants/style.dart';
 import 'package:vending_standalone/src/models/stocks/stocks.dart';
 import 'package:vending_standalone/src/widgets/md_widget/label_text.dart';
@@ -90,12 +91,45 @@ class _AddStockFormState extends State<AddStockForm> {
                 ),
                 TextButton(
                   onPressed: () async {
-                    if (usernameController.text == "admin" &&
-                        passwordController.text == "1234") {
-                      Navigator.of(context).pop(true);
-                    } else {
-                      ScaffoldMessage.show(context, Icons.error_outline_rounded,
-                          'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'e');
+                    try {
+                      final response = await DioHelper.instance.dio
+                          .post('/auth/verify-drug', data: {
+                        "username": usernameController.text,
+                        "password": passwordController.text
+                      });
+                      if (response.data['data'].isNotEmpty &&
+                          response.data['data'] == 'OVERRIDDEN') {
+                        Navigator.of(context).pop(true);
+                      } else {
+                        Navigator.of(context).pop(false);
+                      }
+                    } catch (error) {
+                      if (error is DioException) {
+                        if (error.response != null) {
+                          if (error.response?.statusCode == 401) {
+                            await StoredLocal.instance
+                                .handleUnauthorized(context);
+                            return;
+                          }
+                          ScaffoldMessage.show(
+                            context,
+                            Icons.error_outline_rounded,
+                            '${error.response?.statusCode} - ${error.response?.data['message']}',
+                            'e',
+                          );
+                          if (kDebugMode) {
+                            print('Error Message: ${error.response?.data}');
+                          }
+                        } else {
+                          if (kDebugMode) {
+                            print('DioError: ${error.message}');
+                          }
+                        }
+                      } else {
+                        if (kDebugMode) {
+                          print('General error: $error');
+                        }
+                      }
                     }
                   },
                   child: const Text("อนุญาต"),

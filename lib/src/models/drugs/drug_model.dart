@@ -3,7 +3,7 @@ class Drugs {
   final String drugCode;
   final String drugName;
   final String unit;
-  final DateTime drugLot;
+  final String drugLot;
   final DateTime drugExpire;
   final int drugPriority;
   final int? weight;
@@ -36,7 +36,7 @@ class Drugs {
       'drugCode': drugCode,
       'drugName': drugName,
       'unit': unit,
-      'drugLot': drugLot.toIso8601String(),
+      'drugLot': drugLot,
       'drugExpire': drugExpire.toIso8601String(),
       'drugPriority': drugPriority,
       'weight': weight,
@@ -54,7 +54,7 @@ class Drugs {
       drugCode: map['drugCode'] as String? ?? '',
       drugName: map['drugName'] as String? ?? '',
       unit: map['unit'] as String? ?? '',
-      drugLot: DateTime.tryParse(map['drugLot'] ?? '') ?? DateTime.now(),
+      drugLot: map['drugLot'] as String? ?? '',
       drugExpire: DateTime.tryParse(map['drugExpire'] ?? '') ?? DateTime.now(),
       drugPriority: map['drugPriority'] as int? ?? 1,
       weight: map['weight'] as int? ?? 0,

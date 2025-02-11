@@ -21,7 +21,6 @@ class InventoryBelow extends StatefulWidget {
 
 class InventoryBelowState extends State<InventoryBelow> {
   List<Stocks> drugData = [];
-  bool isLoading = false;
 
   @override
   void initState() {
@@ -40,12 +39,10 @@ class InventoryBelowState extends State<InventoryBelow> {
 
         setState(() {
           drugData = machineList;
-          isLoading = true;
         });
       } else {
         setState(() {
           drugData = [];
-          isLoading = false;
         });
       }
     } catch (error) {
@@ -68,13 +65,6 @@ class InventoryBelowState extends State<InventoryBelow> {
           print('General error: $error');
         }
       }
-      setState(() {
-        isLoading = false;
-      });
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
     }
   }
 
@@ -216,8 +206,13 @@ class InventoryBelowState extends State<InventoryBelow> {
         text: 'รายงานยาที่ต้องเติม',
         isBottom: false,
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+      body: drugData.isEmpty
+          ? Container(
+              color: Colors.white,
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            )
           : PdfPreview(
               build: (format) async => generatePdf(drugData),
             ),

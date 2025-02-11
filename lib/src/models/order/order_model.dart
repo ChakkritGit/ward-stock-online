@@ -71,7 +71,7 @@ class Order {
   final String drugName;
   final int qty;
   final String unit;
-  final DateTime drugLot;
+  final String drugLot;
   final DateTime drugExpire;
   final int drugPriority;
   final int position;
@@ -107,7 +107,7 @@ class Order {
       drugName: json['drugName'] as String,
       qty: json['qty'] as int,
       unit: json['unit'] as String,
-      drugLot: DateTime.tryParse(json['drugLot'] ?? '') ?? DateTime.now(),
+      drugLot: json['drugLot'] as String,
       drugExpire: DateTime.tryParse(json['drugExpire'] ?? '') ?? DateTime.now(),
       drugPriority: json['drugPriority'] as int,
       position: json['position'] as int,

@@ -5,12 +5,15 @@ import 'dart:async';
 import 'package:dart_amqp/dart_amqp.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vending_standalone/src/api/dio_helper.dart';
+import 'package:vending_standalone/src/blocs/users/user_bloc.dart';
 import 'package:vending_standalone/src/constants/env.dart';
 import 'package:vending_standalone/src/models/rabbit/rabbit_model.dart';
 import 'package:vending_standalone/src/services/dispense.dart';
 import 'package:vending_standalone/src/services/serialport.dart';
+import 'package:vending_standalone/src/widgets/utils/scaffold_message.dart';
 
 class RabbitMQService {
   final VendingMachine vending;
@@ -76,9 +79,94 @@ class RabbitMQService {
 
   void handleMessage(String message) async {
     final Dispense dispense = Dispense(vending: vending);
+    final userData = context.read<UserBloc>().state.userData;
+
     try {
       Map<String, dynamic> jsonData = jsonDecode(message);
       OrderRabbit order = OrderRabbit.fromMap(jsonData);
+
+      if ((order.priority == 2 || order.priority == 3) &&
+          (userData[0].role == 'ADMIN' || userData[0].role == 'USER')) {
+        Completer<bool> completer = Completer<bool>();
+
+        Future.microtask(() async {
+          bool? isConfirmed = await showDialog<bool>(
+            barrierDismissible: false,
+            context: context,
+            builder: (BuildContext context) {
+              TextEditingController usernameController =
+                  TextEditingController();
+              TextEditingController passwordController =
+                  TextEditingController();
+
+              return AlertDialog(
+                title: const Text("ยืนยันตัวตน"),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: usernameController,
+                      decoration: const InputDecoration(labelText: "Username"),
+                    ),
+                    TextField(
+                      controller: passwordController,
+                      decoration: const InputDecoration(labelText: "Password"),
+                      obscureText: true,
+                    ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                    child: const Text("ปฏิเสธ"),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      try {
+                        final response = await DioHelper.instance.dio
+                            .post('/auth/verify-drug', data: {
+                          "username": usernameController.text,
+                          "password": passwordController.text
+                        });
+
+                        if (response.data['data'].isNotEmpty &&
+                            response.data['data'] == 'OVERRIDDEN') {
+                          Navigator.of(context).pop(true);
+                        } else {
+                          Navigator.of(context).pop(false);
+                        }
+                      } catch (error) {
+                        if (kDebugMode) {
+                          print('Error verifying user: $error');
+                        }
+                        Navigator.of(context).pop(false);
+                      }
+                    },
+                    child: const Text("อนุญาต"),
+                  ),
+                ],
+              );
+            },
+          );
+
+          completer.complete(isConfirmed ?? false);
+        });
+
+        bool isConfirmed = await completer.future;
+
+        if (!isConfirmed) {
+          newMessage!.reject(true);
+          ScaffoldMessage.show(
+            context,
+            Icons.error_outline_rounded,
+            'การอนุมัติถูกปฏิเสธ',
+            'e',
+          );
+          return;
+        }
+      }
 
       await dioHelper.dio
           .get('/dispense/order/status/pending/${order.id}/${order.presId}');
@@ -92,14 +180,13 @@ class RabbitMQService {
       if (dispensed) {
         await dioHelper.dio
             .get('/dispense/order/status/receive/${order.id}/${order.presId}');
-        await dioHelper.fetchOrder(context);
-        await vending.disconnectPort();
       } else {
         await dioHelper.dio
             .get('/dispense/order/status/error/${order.id}/${order.presId}');
-        await dioHelper.fetchOrder(context);
-        await vending.disconnectPort();
       }
+
+      await dioHelper.fetchOrder(context);
+      await vending.disconnectPort();
     } catch (error) {
       if (kDebugMode) {
         print(error);

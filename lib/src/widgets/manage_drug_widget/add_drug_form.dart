@@ -223,10 +223,7 @@ class _AddDrugFormState extends State<AddDrugForm> {
     drugName = TextEditingController(text: widget.drug?.drugName);
     drugUnit = TextEditingController(text: widget.drug?.unit);
     weight = TextEditingController(text: widget.drug?.weight.toString());
-    drugLot = TextEditingController(
-        text: widget.drug?.drugLot != null
-            ? DateFormat('dd/MM/yyyy').format(widget.drug!.drugLot)
-            : '');
+    drugLot = TextEditingController(text: widget.drug!.drugLot);
     drugExpire = TextEditingController(
         text: widget.drug?.drugExpire != null
             ? DateFormat('dd/MM/yyyy').format(widget.drug!.drugExpire)

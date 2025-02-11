@@ -228,7 +228,7 @@ class _ManageDrugScreenState extends State<ManageDrugScreen> {
                                             Row(
                                               children: [
                                                 Text(
-                                                  'Lot: ${DateFormat('dd/MM/yyyy').format(drug.drugLot)}',
+                                                  'Lot: ${drug.drugLot}',
                                                   style: const TextStyle(
                                                     fontSize: 18.0,
                                                   ),

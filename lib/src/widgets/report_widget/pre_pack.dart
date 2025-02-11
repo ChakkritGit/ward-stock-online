@@ -22,7 +22,12 @@ class PrePack extends StatelessWidget {
         future: loadPdfFromAssets(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
+            return Container(
+              color: Colors.white,
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
           }
           return PdfPreview(
             build: (format) async => snapshot.data!,

@@ -417,7 +417,7 @@ class _AddUserFormState extends State<AddUserForm> {
                     ),
                     CustomGap.smallWidthGap,
                     const Text(
-                      'SUPER',
+                      'หัวหน้าเภสัชกร',
                       style: TextStyle(fontSize: 20.0),
                     ),
                   ],
@@ -440,7 +440,7 @@ class _AddUserFormState extends State<AddUserForm> {
                     ),
                     CustomGap.smallWidthGap,
                     const Text(
-                      'ADMIN',
+                      'เภสัชกร',
                       style: TextStyle(fontSize: 20.0),
                     ),
                   ],
@@ -463,7 +463,7 @@ class _AddUserFormState extends State<AddUserForm> {
                     ),
                     CustomGap.smallWidthGap,
                     const Text(
-                      'USER',
+                      'พยาบาล',
                       style: TextStyle(fontSize: 20.0),
                     ),
                   ],
