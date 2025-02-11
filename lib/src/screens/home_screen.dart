@@ -187,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future initialData() async {
-    // await rabbitMQ.listenToQueue("vdOrder");
+    await rabbitMQ.listenToQueue("vdOrder");
     UserLocal? userData = await StoredLocal.instance.getUserData();
     if (userData != null) {
       setState(() {
@@ -213,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // vending.connectPort();
+    vending.connectPort();
     initialData();
   }
 
