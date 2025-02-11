@@ -223,7 +223,7 @@ class _AddDrugFormState extends State<AddDrugForm> {
     drugName = TextEditingController(text: widget.drug?.drugName);
     drugUnit = TextEditingController(text: widget.drug?.unit);
     weight = TextEditingController(text: widget.drug?.weight.toString());
-    drugLot = TextEditingController(text: widget.drug!.drugLot);
+    drugLot = TextEditingController(text: widget.drug?.drugLot);
     drugExpire = TextEditingController(
         text: widget.drug?.drugExpire != null
             ? DateFormat('dd/MM/yyyy').format(widget.drug!.drugExpire)
@@ -414,34 +414,12 @@ class _AddDrugFormState extends State<AddDrugForm> {
             margin: CustomMargin.marginSymmetricVertical_1,
             padding: CustomPadding.paddingSymmetricInput,
             decoration: CustomInputStyle.inputBoxdecoration,
-            child: GestureDetector(
-              onTap: () async {
-                DateTime? pickedDate = await showDatePicker(
-                  context: context,
-                  initialDate: drugLot.text.isNotEmpty
-                      ? DateFormat('dd/MM/yyyy').parse(drugLot.text)
-                      : DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2100),
-                  locale: const Locale('th', 'TH'),
-                );
-
-                if (pickedDate != null) {
-                  String formattedDate =
-                      DateFormat('dd/MM/yyyy').format(pickedDate);
-                  drugLot.text = formattedDate;
-                }
-              },
-              child: AbsorbPointer(
-                child: TextFormField(
-                  controller: drugLot,
-                  style: CustomInputStyle.inputStyle,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'เลือกวันหมดอายุ',
-                    hintStyle: CustomInputStyle.inputHintStyle,
-                  ),
-                ),
+            child: TextFormField(
+              controller: drugLot,
+              style: CustomInputStyle.inputStyle,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                hintStyle: CustomInputStyle.inputHintStyle,
               ),
             ),
           ),
