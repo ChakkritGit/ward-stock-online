@@ -30,9 +30,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final dioHelper = DioHelper();
-  final VendingMachine vending = VendingMachine();
-  late RabbitMQService rabbitMQ =
-      RabbitMQService(vending: vending, context: context);
+  late VendingMachine vending;
+  late RabbitMQService rabbitMQ;
 
   final UserDataService userDataService = UserDataService();
   String buffer = '';
@@ -213,6 +212,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    vending = VendingMachine();
+    rabbitMQ = RabbitMQService(vending: vending, context: context);
     vending.connectPort();
     initialData();
   }

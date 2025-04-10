@@ -4,13 +4,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vending_standalone/src/services/serialport.dart';
 
 class Dispense {
+  static Dispense? _instance;
   final VendingMachine vending;
   late SharedPreferences prefs;
   List<int> writedata = [];
   int running = 1;
 
-  Dispense({required this.vending}) {
+  // Private named constructor
+  Dispense._internal({required this.vending}) {
     initializeSharedPreferences();
+  }
+
+  // Singleton factory constructor
+  factory Dispense({required VendingMachine vending}) {
+    _instance ??= Dispense._internal(vending: vending);
+    return _instance!;
   }
 
   Future<void> initializeSharedPreferences() async {
@@ -83,14 +91,10 @@ class Dispense {
           if (isDispense) {
             switch (response.join(',')) {
               case '26,31,d,a,32,d,a,33,d,a,31,d,a,37,d,a':
-                // ล็อกกลอน
-                // สั่งเปิดประตู
                 vending.writeSerialttyS2('# 1 1 5 10 17');
                 progress = 'doorOpened';
                 break;
               case '26,31,d,a,32,d,a,35,d,a,31,d,a,39,d,a':
-                // ประตูเปิดแล้ว
-                // สั่งลิฟต์ขึ้นตามชั้น
                 switch (position) {
                   case <= 10:
                     floor = 1400;
@@ -108,31 +112,24 @@ class Dispense {
                     floor = 20;
                 }
                 vending.writeSerialttyS2(
-                    '# 1 1 1 ${floor.toString()} ${floor + 1 + 1 + 1}');
+                    '# 1 1 1 ${floor.toString()} ${floor + 3}');
                 progress = 'liftUp';
                 break;
               case '26,31,d,a,32,d,a,31,d,a,31,d,a,35,d,a':
-                // ลิฟต์ขึ้นและลงแล้ว
                 if (progress == 'liftUp') {
-                  // สั่งหยิบ
                   progress = 'dispensing';
                   writeSerialttyS1(position);
                 } else {
-                  // สั่งปิดประตู
                   vending.writeSerialttyS2('# 1 1 6 10 18');
                   progress = 'doorClosed';
                 }
                 break;
               case '26,31,d,a,32,d,a,36,d,a,31,d,a,31,30,d,a':
-                // ประตูปิดแล้ว
-                // สั่งปลดล็อกกลอน
                 progress = 'rackUnlocked';
                 vending.writeSerialttyS2('# 1 1 3 0 5');
                 break;
               case '26,31,d,a,32,d,a,33,d,a,30,d,a,36,d,a':
-                // ปลอดล็อกกลอนแล้ว
-                // กลับคืนค่าเริ่มต้น
-                await Future.delayed(const Duration(milliseconds: 500));
+                await Future.delayed(const Duration(milliseconds: 200));
                 completer.complete(true);
                 qty = 0;
                 floor = 20;
@@ -176,15 +173,12 @@ class Dispense {
           if (isDispense) {
             switch (response.join(',')) {
               case '26,31,d,a,32,d,a,31,d,a,31,d,a,35,d,a':
-                // ลิฟต์ขึ้นและลงแล้ว
                 if (progress == 'liftDown') {
-                  // สั่งปิดประตู
                   vending.writeSerialttyS2('# 1 1 6 10 18');
                   progress = 'doorClosed';
                 }
                 break;
               case '26,31,d,a,32,d,a,36,d,a,31,d,a,31,30,d,a':
-                // ประตูปิดแล้ว
                 completer.complete(true);
                 progress = 'ready';
                 isDispense = false;
@@ -234,10 +228,4 @@ class Dispense {
     commands.add(checksum);
     writedata = commands;
   }
-
-  // void backToHome() async {
-  //   progress = 'liftDown';
-  //   await Future.delayed(const Duration(seconds: 1));
-  //   vending.writeSerialttyS2("# 1 1 1 -1 2");
-  // }
 }
