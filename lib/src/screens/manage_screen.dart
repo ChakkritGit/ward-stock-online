@@ -203,6 +203,51 @@ class ManageScreen extends StatelessWidget {
                     height: 0.0,
                     indent: 100.0,
                   ),
+                  ListTile(
+                    onTap: () => {
+                      Navigator.pushNamed(
+                        // ignore: use_build_context_synchronously
+                        context,
+                        custom_route.Routes.dispense,
+                      )
+                    },
+                    splashColor: ColorsTheme.primary.withValues(alpha: 0.3),
+                    leading: ClipRRect(
+                      borderRadius: BorderRadius.circular(10.0),
+                      child: Container(
+                        width: 60.0,
+                        height: 60.0,
+                        padding: const EdgeInsets.all(10.0),
+                        alignment: Alignment.center,
+                        color: ColorsTheme
+                            .primary, // Add the same color or a different one
+                        child: const Icon(
+                          Icons.build_circle_sharp,
+                          size: 36.0,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    title: const Text(
+                      "เลือกช่องจ่าย",
+                      style: TextStyle(
+                        fontSize: 22.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    minTileHeight: 80.0,
+                    horizontalTitleGap: 25.0,
+                    trailing: const Icon(
+                      Icons.navigate_next,
+                      size: 36.0,
+                    ),
+                  ),
+                  Divider(
+                    thickness: 1.0,
+                    color: Colors.grey[300],
+                    height: 0.0,
+                    indent: 100.0,
+                  ),
                 ],
               ),
             ),

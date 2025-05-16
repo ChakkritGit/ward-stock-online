@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vending_standalone/src/screens/add_group.dart';
 import 'package:vending_standalone/src/screens/add_inventory.dart';
 import 'package:vending_standalone/src/screens/add_machine.dart';
+import 'package:vending_standalone/src/screens/dispense_Screen.dart';
 import 'package:vending_standalone/src/screens/manage_main_inventory_screen.dart';
 import 'package:vending_standalone/src/screens/manage_machine_screen.dart';
 import 'package:vending_standalone/src/screens/manage_profile_screen.dart';
@@ -35,6 +36,7 @@ class Routes {
   static const reportBelow = '/report_below';
   static const reportLogDispense = '/report_log_dispense';
   static const reportPrePack = '/report_pre_pack';
+  static const dispense = '/dispense';
 
   static const database = '/database';
 
@@ -61,5 +63,6 @@ class Routes {
     reportBelow: (context) => const InventoryBelow(),
     reportLogDispense: (context) => const LogDispense(),
     reportPrePack: (context) => const PrePack(),
+    dispense: (context) => const DispenseScreen(),
   };
 }

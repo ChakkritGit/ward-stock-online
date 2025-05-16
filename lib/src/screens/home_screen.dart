@@ -212,9 +212,15 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    vending = VendingMachine();
-    rabbitMQ = RabbitMQService(vending: vending, context: context);
-    vending.connectPort();
+    try {
+      vending = VendingMachine();
+      rabbitMQ = RabbitMQService(vending: vending, context: context);
+      vending.connectPort();
+    } catch (error) {
+      if (kDebugMode) {
+        print("SerialPortError: $error");
+      }
+    }
     initialData();
   }
 

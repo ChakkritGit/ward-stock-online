@@ -33,10 +33,10 @@ class Dispense {
     int floor = -1;
     int qty = dispenseQty;
 
-    vending.writeSerialttyS2('# 1 1 3 1 6');
-    isDispense = true;
-
     try {
+      vending.writeSerialttyS2('# 1 1 3 1 6');
+      isDispense = true;
+
       vending.upcomingDatattyS1().listen(
         (data) async {
           List<String> listenData =
